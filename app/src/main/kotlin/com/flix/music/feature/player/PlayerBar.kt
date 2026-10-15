@@ -122,7 +122,9 @@ fun PlayerBar(state: PlayerState, volume: Int, actions: PlayerBarActions, modifi
         }
 
         Column(
-            modifier = Modifier.weight(CENTER_WEIGHT),
+            modifier = Modifier
+                .weight(CENTER_WEIGHT)
+                .padding(top = CONTROLS_TOP_OFFSET),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Row(
@@ -170,7 +172,9 @@ fun PlayerBar(state: PlayerState, volume: Int, actions: PlayerBarActions, modifi
                     onSeek = actions.onSeek,
                     contentDescription = stringResource(Res.string.player_seek),
                     bufferPulsing = state.status == PlaybackStatus.Buffering,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(SEEK_ROW_HEIGHT),
                 )
                 TimeLabel(state.duration ?: Duration.ZERO)
             }
@@ -269,7 +273,11 @@ private fun ModeButton(icon: DrawableResource, label: String, isActive: Boolean,
     }
 }
 
-private val BAR_HEIGHT = 88.dp
+private val BAR_HEIGHT = 92.dp
+private val SEEK_ROW_HEIGHT = 28.dp
+
+/** The play button's touch area pads it on top and the seek line sits low: this evens both edges. */
+private val CONTROLS_TOP_OFFSET = 8.dp
 private val ARTWORK_SIZE = 56.dp
 private val PLAY_BUTTON_SIZE = 40.dp
 private val PLAY_ICON_SIZE = 24.dp
