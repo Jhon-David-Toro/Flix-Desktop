@@ -12,12 +12,16 @@ import com.flix.music.core.designsystem.theme.ThemeMode
 import com.flix.music.core.model.AlbumRef
 import com.flix.music.core.model.AppTheme
 import com.flix.music.core.model.ArtistRef
+import com.flix.music.core.model.Lyrics
 import com.flix.music.core.model.Track
 import com.flix.music.core.model.UserSettings
 import com.flix.music.core.player.PlaybackSource
 import com.flix.music.core.player.PlaybackStatus
 import com.flix.music.core.player.PlayerState
 import com.flix.music.core.player.RepeatMode
+import com.flix.music.feature.player.LyricsPanelContent
+import com.flix.music.feature.player.LyricsUiState
+import com.flix.music.feature.player.NowPlayingContent
 import com.flix.music.feature.player.PlayerBar
 import com.flix.music.feature.player.PlayerBarActions
 import com.flix.music.feature.search.SearchActions
@@ -96,6 +100,41 @@ class ScreensSnapshotTest {
                     )
                 }
             }
+        }
+    }
+
+    @Test
+    fun `reproductor a pantalla completa con la letra sincronizada`() = snapshot("now-playing") {
+        Column(Modifier.fillMaxSize().background(FlixTheme.colors.background)) {
+            Box(Modifier.weight(1f)) {
+                NowPlayingContent(
+                    state = playerState.copy(position = 98.seconds),
+                    isFavorite = true,
+                    onToggleFavorite = {},
+                    onClose = {},
+                    lyrics = {
+                        LyricsPanelContent(
+                            lyricsState = LyricsUiState.Ready(
+                                Lyrics.fromLrc(
+                                    listOf(
+                                        "[01:20]Apagaron la última luz",
+                                        "[01:30]y el eco se quedó",
+                                        "[01:36]la pantalla sigue encendida",
+                                        "[01:42]aunque ya no quede nadie",
+                                        "[01:48]sentado en la fila siete",
+                                        "[01:54]esperando los créditos",
+                                    ).joinToString("\n"),
+                                ),
+                            ),
+                            position = 98.seconds,
+                            onLineClick = {},
+                            onRetry = {},
+                        )
+                    },
+                    queue = {},
+                )
+            }
+            PlayerBar(state = playerState.copy(position = 98.seconds), volume = 70, actions = PlayerBarActions())
         }
     }
 }

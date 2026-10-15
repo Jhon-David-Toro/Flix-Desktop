@@ -42,8 +42,10 @@ import com.flix.music.core.ui.LocalAppGraph
 import com.flix.music.core.ui.window.TITLE_BAR_HEIGHT
 import com.flix.music.core.ui.window.WindowButtons
 import com.flix.music.core.ui.window.WindowDragArea
+import com.flix.music.feature.player.NowPlayingView
 import com.flix.music.feature.player.PlayerBar
 import com.flix.music.feature.player.PlayerBarActions
+import com.flix.music.feature.player.QueueActions
 import com.flix.music.feature.search.SearchScreen
 import com.flix.music.feature.settings.SettingsScreen
 import com.flix.music.resources.Res
@@ -81,6 +83,8 @@ fun FlixDesktopApp() {
     val playerState by player.state.collectAsStateWithLifecycle()
     var section by rememberSaveable { mutableStateOf(Section.Home) }
     var volume by rememberSaveable { mutableIntStateOf(DEFAULT_VOLUME) }
+    var nowPlayingOpen by rememberSaveable { mutableStateOf(false) }
+    if (playerState.current == null) nowPlayingOpen = false
     val snackbarHostState = remember { SnackbarHostState() }
     val playerActions = remember(player) {
         PlayerBarActions(
@@ -96,6 +100,19 @@ fun FlixDesktopApp() {
             },
         )
     }
+    val queueActions = remember(player) {
+        QueueActions(
+            onItemClick = { item -> player.skipToQueueItem(item.index) },
+            onRemove = player::removeQueueItem,
+            onRestore = player::restoreQueueItem,
+            onMove = player::moveQueueItem,
+            onClear = player::clearUpNext,
+            onBrowseMusic = {
+                nowPlayingOpen = false
+                section = Section.Search
+            },
+        )
+    }
 
     CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {
         Column(
@@ -104,7 +121,13 @@ fun FlixDesktopApp() {
                 .background(FlixTheme.colors.background),
         ) {
             Row(Modifier.weight(1f)) {
-                SideMenu(selected = section, onSelect = { section = it })
+                SideMenu(
+                    selected = section,
+                    onSelect = { selected ->
+                        section = selected
+                        nowPlayingOpen = false
+                    },
+                )
                 Column(
                     Modifier
                         .weight(1f)
@@ -137,6 +160,13 @@ fun FlixDesktopApp() {
                                 color = FlixTheme.colors.textPrimary,
                             )
                         }
+                        if (nowPlayingOpen) {
+                            NowPlayingView(
+                                state = playerState,
+                                queueActions = queueActions,
+                                onClose = { nowPlayingOpen = false },
+                            )
+                        }
                         SnackbarHost(
                             hostState = snackbarHostState,
                             modifier = Modifier
@@ -146,7 +176,11 @@ fun FlixDesktopApp() {
                     }
                 }
             }
-            PlayerBar(state = playerState, volume = volume, actions = playerActions)
+            PlayerBar(
+                state = playerState,
+                volume = volume,
+                actions = playerActions.copy(onOpenPlayer = { nowPlayingOpen = !nowPlayingOpen }),
+            )
         }
     }
 }

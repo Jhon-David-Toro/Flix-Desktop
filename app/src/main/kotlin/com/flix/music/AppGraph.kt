@@ -8,6 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.flix.music.core.data.database.FlixDatabase
+import com.flix.music.core.data.lyrics.LrclibClient
+import com.flix.music.core.data.lyrics.SavedLyricsStore
 import com.flix.music.core.data.repository.FavoritesRepository
 import com.flix.music.core.data.repository.FavoritesRepositoryImpl
 import com.flix.music.core.data.repository.FollowedArtistsRepository
@@ -16,6 +18,8 @@ import com.flix.music.core.data.repository.HistoryRepository
 import com.flix.music.core.data.repository.HistoryRepositoryImpl
 import com.flix.music.core.data.repository.LibraryLayoutRepository
 import com.flix.music.core.data.repository.LibraryLayoutRepositoryImpl
+import com.flix.music.core.data.repository.LyricsRepository
+import com.flix.music.core.data.repository.LyricsRepositoryImpl
 import com.flix.music.core.data.repository.MusicRepository
 import com.flix.music.core.data.repository.MusicRepositoryImpl
 import com.flix.music.core.data.repository.PlaylistsRepository
@@ -34,6 +38,8 @@ import com.flix.music.core.player.mpv.MpvEngine
 import com.flix.music.core.player.stream.AudioServer
 import com.flix.music.core.player.stream.NewPipeStreamResolver
 import com.flix.music.core.system.WindowsAutostart
+import com.flix.music.feature.player.LyricsViewModel
+import com.flix.music.feature.player.NowPlayingViewModel
 import com.flix.music.feature.search.SearchViewModel
 import com.flix.music.feature.settings.SettingsViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -104,6 +110,10 @@ class AppGraph(val dataDirectory: File = defaultDataDirectory()) {
 
     val libraryLayoutRepository: LibraryLayoutRepository = LibraryLayoutRepositoryImpl(preferences)
 
+    private val savedLyricsStore = SavedLyricsStore(File(dataDirectory, "lyrics"), json)
+
+    val lyricsRepository: LyricsRepository = LyricsRepositoryImpl(LrclibClient(okHttpClient, json), savedLyricsStore)
+
     private val autostart = WindowsAutostart()
 
     private val autoplay = DesktopAutoplay(
@@ -122,6 +132,8 @@ class AppGraph(val dataDirectory: File = defaultDataDirectory()) {
     fun <Model : ViewModel> viewModel(type: KClass<Model>, savedStateHandle: SavedStateHandle): Model = when (type) {
         SearchViewModel::class -> SearchViewModel(musicRepository, recentSearchesRepository, player)
         SettingsViewModel::class -> SettingsViewModel(settingsRepository, autostart, VERSION)
+        LyricsViewModel::class -> LyricsViewModel(lyricsRepository, player)
+        NowPlayingViewModel::class -> NowPlayingViewModel(player, favoritesRepository)
         else -> error("No ViewModel factory for ${type.simpleName}")
     } as Model
 
