@@ -9,6 +9,7 @@ okhttp = "5.5.0"
 newpipeExtractor = "v0.26.5"
 coil = "3.6.3"
 junit = "4.13.2"
+jna = "5.19.1"
 
 [libraries]
 compose-material3 = { group = "org.jetbrains.compose.material3", name = "material3", version.ref = "composeMaterial3" }
@@ -22,6 +23,7 @@ okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhtt
 newpipe-extractor = { group = "com.github.TeamNewPipe", name = "NewPipeExtractor", version.ref = "newpipeExtractor" }
 coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
 coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
+jna = { group = "net.java.dev.jna", name = "jna", version.ref = "jna" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 
 [plugins]

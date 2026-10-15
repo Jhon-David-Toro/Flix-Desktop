@@ -23,9 +23,15 @@ dependencies {
     implementation(libs.newpipe.extractor)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    implementation(libs.jna)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
+}
+
+tasks.test {
+    systemProperty("flix.liveTests", providers.gradleProperty("liveTests").getOrElse("false"))
+    systemProperty("compose.application.resources.dir", layout.projectDirectory.dir("resources/windows").asFile.absolutePath)
 }
 
 compose.resources {
@@ -36,6 +42,7 @@ compose.resources {
 compose.desktop {
     application {
         mainClass = "com.flix.music.MainKt"
+        nativeDistributions.appResourcesRootDir = layout.projectDirectory.dir("resources")
         nativeDistributions {
             targetFormats(TargetFormat.Msi, TargetFormat.Exe)
             packageName = "Flix"
