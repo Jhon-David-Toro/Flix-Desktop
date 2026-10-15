@@ -1,0 +1,798 @@
+{
+ "contents": {
+  "singleColumnMusicWatchNextResultsRenderer": {
+   "tabbedRenderer": {
+    "watchNextTabbedResultsRenderer": {
+     "tabs": [
+      {
+       "tabRenderer": {
+        "title": "Up next",
+        "content": {
+         "musicQueueRenderer": {
+          "content": {
+           "playlistPanelRenderer": {
+            "contents": [
+             {
+              "playlistPanelVideoRenderer": {
+               "title": {
+                "runs": [
+                 {
+                  "text": "Fade To Black"
+                 }
+                ]
+               },
+               "longBylineText": {
+                "runs": [
+                 {
+                  "text": "Metallica",
+                  "navigationEndpoint": {
+                   "clickTrackingParams": "CMMHEMggGAAiEwjR8Lip37iXAxUJ19IEHQE5OQrKAQTPXLfl",
+                   "browseEndpoint": {
+                    "browseId": "UCGexNm_Kw4rdQjLxmpb2EKw",
+                    "browseEndpointContextSupportedConfigs": {
+                     "browseEndpointContextMusicConfig": {
+                      "pageType": "MUSIC_PAGE_TYPE_ARTIST"
+                     }
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "Ride The Lightning",
+                  "navigationEndpoint": {
+                   "clickTrackingParams": "CMMHEMggGAAiEwjR8Lip37iXAxUJ19IEHQE5OQrKAQTPXLfl",
+                   "browseEndpoint": {
+                    "browseId": "MPREb_vbNohrhu6ae",
+                    "browseEndpointContextSupportedConfigs": {
+                     "browseEndpointContextMusicConfig": {
+                      "pageType": "MUSIC_PAGE_TYPE_ALBUM"
+                     }
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "1984"
+                 }
+                ]
+               },
+               "thumbnail": {
+                "thumbnails": [
+                 {
+                  "url": "https://yt3.googleusercontent.com/HKr9WCd9tdKApTcdOBIo6VYPSsXMQ-JxUhDbKodbQS67J-fLUtWQYRWjtXrGo6jBYTCgmiusWRjzIUBWZA=w60-h60-l90-rj",
+                  "width": 60,
+                  "height": 60
+                 },
+                 {
+                  "url": "https://yt3.googleusercontent.com/HKr9WCd9tdKApTcdOBIo6VYPSsXMQ-JxUhDbKodbQS67J-fLUtWQYRWjtXrGo6jBYTCgmiusWRjzIUBWZA=w120-h120-l90-rj",
+                  "width": 120,
+                  "height": 120
+                 },
+                 {
+                  "url": "https://yt3.googleusercontent.com/HKr9WCd9tdKApTcdOBIo6VYPSsXMQ-JxUhDbKodbQS67J-fLUtWQYRWjtXrGo6jBYTCgmiusWRjzIUBWZA=w180-h180-l90-rj",
+                  "width": 180,
+                  "height": 180
+                 },
+                 {
+                  "url": "https://yt3.googleusercontent.com/HKr9WCd9tdKApTcdOBIo6VYPSsXMQ-JxUhDbKodbQS67J-fLUtWQYRWjtXrGo6jBYTCgmiusWRjzIUBWZA=w226-h226-l90-rj",
+                  "width": 226,
+                  "height": 226
+                 },
+                 {
+                  "url": "https://yt3.googleusercontent.com/HKr9WCd9tdKApTcdOBIo6VYPSsXMQ-JxUhDbKodbQS67J-fLUtWQYRWjtXrGo6jBYTCgmiusWRjzIUBWZA=w302-h302-l90-rj",
+                  "width": 302,
+                  "height": 302
+                 },
+                 {
+                  "url": "https://yt3.googleusercontent.com/HKr9WCd9tdKApTcdOBIo6VYPSsXMQ-JxUhDbKodbQS67J-fLUtWQYRWjtXrGo6jBYTCgmiusWRjzIUBWZA=w544-h544-l90-rj",
+                  "width": 544,
+                  "height": 544
+                 }
+                ]
+               },
+               "lengthText": {
+                "runs": [
+                 {
+                  "text": "6:58"
+                 }
+                ],
+                "accessibility": {
+                 "accessibilityData": {
+                  "label": "6 minutes, 58 seconds"
+                 }
+                }
+               },
+               "videoId": "9HZ_tx8aWuA",
+               "shortBylineText": {
+                "runs": [
+                 {
+                  "text": "Metallica"
+                 }
+                ]
+               }
+              }
+             },
+             {
+              "playlistPanelVideoRenderer": {
+               "title": {
+                "runs": [
+                 {
+                  "text": "Master of Puppets"
+                 }
+                ]
+               },
+               "longBylineText": {
+                "runs": [
+                 {
+                  "text": "Metallica",
+                  "navigationEndpoint": {
+                   "clickTrackingParams": "CLEHEMggGAEiEwjR8Lip37iXAxUJ19IEHQE5OQrKAQTPXLfl",
+                   "browseEndpoint": {
+                    "browseId": "UCGexNm_Kw4rdQjLxmpb2EKw",
+                    "browseEndpointContextSupportedConfigs": {
+                     "browseEndpointContextMusicConfig": {
+                      "pageType": "MUSIC_PAGE_TYPE_ARTIST"
+                     }
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "Master of Puppets (Remastered Deluxe Box Set)",
+                  "navigationEndpoint": {
+                   "clickTrackingParams": "CLEHEMggGAEiEwjR8Lip37iXAxUJ19IEHQE5OQrKAQTPXLfl",
+                   "browseEndpoint": {
+                    "browseId": "MPREb_RH6I3bwVH5t",
+                    "browseEndpointContextSupportedConfigs": {
+                     "browseEndpointContextMusicConfig": {
+                      "pageType": "MUSIC_PAGE_TYPE_ALBUM"
+                     }
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "1986"
+                 }
+                ]
+               },
+               "thumbnail": {
+                "thumbnails": [
+                 {
+                  "url": "https://yt3.googleusercontent.com/wK5h2K63Ey5234foKQXFeY0zDJ-a53NOCY2DKcmATlaIbhFjawJ_oXUBT6-dhaCN8xgNreuXobcUsIU=w60-h60-l90-rj",
+                  "width": 60,
+                  "height": 60
+                 },
+                 {
+                  "url": "https://yt3.googleusercontent.com/wK5h2K63Ey5234foKQXFeY0zDJ-a53NOCY2DKcmATlaIbhFjawJ_oXUBT6-dhaCN8xgNreuXobcUsIU=w120-h120-l90-rj",
+                  "width": 120,
+                  "height": 120
+                 },
+                 {
+                  "url": "https://yt3.googleusercontent.com/wK5h2K63Ey5234foKQXFeY0zDJ-a53NOCY2DKcmATlaIbhFjawJ_oXUBT6-dhaCN8xgNreuXobcUsIU=w180-h180-l90-rj",
+                  "width": 180,
+                  "height": 180
+                 },
+                 {
+                  "url": "https://yt3.googleusercontent.com/wK5h2K63Ey5234foKQXFeY0zDJ-a53NOCY2DKcmATlaIbhFjawJ_oXUBT6-dhaCN8xgNreuXobcUsIU=w226-h226-l90-rj",
+                  "width": 226,
+                  "height": 226
+                 },
+                 {
+                  "url": "https://yt3.googleusercontent.com/wK5h2K63Ey5234foKQXFeY0zDJ-a53NOCY2DKcmATlaIbhFjawJ_oXUBT6-dhaCN8xgNreuXobcUsIU=w302-h302-l90-rj",
+                  "width": 302,
+                  "height": 302
+                 },
+                 {
+                  "url": "https://yt3.googleusercontent.com/wK5h2K63Ey5234foKQXFeY0zDJ-a53NOCY2DKcmATlaIbhFjawJ_oXUBT6-dhaCN8xgNreuXobcUsIU=w544-h544-l90-rj",
+                  "width": 544,
+                  "height": 544
+                 }
+                ]
+               },
+               "lengthText": {
+                "runs": [
+                 {
+                  "text": "8:36"
+                 }
+                ],
+                "accessibility": {
+                 "accessibilityData": {
+                  "label": "8 minutes, 36 seconds"
+                 }
+                }
+               },
+               "videoId": "E0ozmU9cJDg",
+               "shortBylineText": {
+                "runs": [
+                 {
+                  "text": "Metallica"
+                 }
+                ]
+               }
+              }
+             },
+             {
+              "playlistPanelVideoRenderer": {
+               "title": {
+                "runs": [
+                 {
+                  "text": "Paranoid (2009 Remaster)"
+                 }
+                ]
+               },
+               "longBylineText": {
+                "runs": [
+                 {
+                  "text": "Black Sabbath",
+                  "navigationEndpoint": {
+                   "clickTrackingParams": "CJ4HEMggGAIiEwjR8Lip37iXAxUJ19IEHQE5OQrKAQTPXLfl",
+                   "browseEndpoint": {
+                    "browseId": "UCLCELUuoHbkUxZ9EMHTYebg",
+                    "browseEndpointContextSupportedConfigs": {
+                     "browseEndpointContextMusicConfig": {
+                      "pageType": "MUSIC_PAGE_TYPE_ARTIST"
+                     }
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "Paranoid",
+                  "navigationEndpoint": {
+                   "clickTrackingParams": "CJ4HEMggGAIiEwjR8Lip37iXAxUJ19IEHQE5OQrKAQTPXLfl",
+                   "browseEndpoint": {
+                    "browseId": "MPREb_nVJN3OahC9r",
+                    "browseEndpointContextSupportedConfigs": {
+                     "browseEndpointContextMusicConfig": {
+                      "pageType": "MUSIC_PAGE_TYPE_ALBUM"
+                     }
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "1970"
+                 }
+                ]
+               },
+               "thumbnail": {
+                "thumbnails": [
+                 {
+                  "url": "https://yt3.googleusercontent.com/uSNyVYPeunGmnCo7UUu3dwohNvpsO7XLJxPZAZetSZ_RRUYgGR5D5p6bi-w6suhxYfvYSng0jdP4i929=w60-h60-l90-rj",
+                  "width": 60,
+                  "height": 60
+                 },
+                 {
+                  "url": "https://yt3.googleusercontent.com/uSNyVYPeunGmnCo7UUu3dwohNvpsO7XLJxPZAZetSZ_RRUYgGR5D5p6bi-w6suhxYfvYSng0jdP4i929=w120-h120-l90-rj",
+                  "width": 120,
+                  "height": 120
+                 },
+                 {
+                  "url": "https://yt3.googleusercontent.com/uSNyVYPeunGmnCo7UUu3dwohNvpsO7XLJxPZAZetSZ_RRUYgGR5D5p6bi-w6suhxYfvYSng0jdP4i929=w180-h180-l90-rj",
+                  "width": 180,
+                  "height": 180
+                 },
+                 {
+                  "url": "https://yt3.googleusercontent.com/uSNyVYPeunGmnCo7UUu3dwohNvpsO7XLJxPZAZetSZ_RRUYgGR5D5p6bi-w6suhxYfvYSng0jdP4i929=w226-h226-l90-rj",
+                  "width": 226,
+                  "height": 226
+                 },
+                 {
+                  "url": "https://yt3.googleusercontent.com/uSNyVYPeunGmnCo7UUu3dwohNvpsO7XLJxPZAZetSZ_RRUYgGR5D5p6bi-w6suhxYfvYSng0jdP4i929=w302-h302-l90-rj",
+                  "width": 302,
+                  "height": 302
+                 },
+                 {
+                  "url": "https://yt3.googleusercontent.com/uSNyVYPeunGmnCo7UUu3dwohNvpsO7XLJxPZAZetSZ_RRUYgGR5D5p6bi-w6suhxYfvYSng0jdP4i929=w544-h544-l90-rj",
+                  "width": 544,
+                  "height": 544
+                 }
+                ]
+               },
+               "lengthText": {
+                "runs": [
+                 {
+                  "text": "2:48"
+                 }
+                ],
+                "accessibility": {
+                 "accessibilityData": {
+                  "label": "2 minutes, 48 seconds"
+                 }
+                }
+               },
+               "videoId": "m7nwbJLO9qo",
+               "shortBylineText": {
+                "runs": [
+                 {
+                  "text": "Black Sabbath"
+                 }
+                ]
+               }
+              }
+             }
+            ]
+           }
+          },
+          "hack": true,
+          "musicQueueConfig": {},
+          "header": {
+           "musicQueueHeaderRenderer": {
+            "title": {
+             "runs": [
+              {
+               "text": "Playing from"
+              }
+             ]
+            },
+            "subtitle": {
+             "runs": [
+              {
+               "text": "Fade To Black Mix"
+              }
+             ]
+            },
+            "buttons": [
+             {
+              "chipCloudChipRenderer": {
+               "style": {
+                "styleType": "STYLE_TRANSPARENT"
+               },
+               "text": {
+                "runs": [
+                 {
+                  "text": "Save"
+                 }
+                ]
+               },
+               "navigationEndpoint": {
+                "clickTrackingParams": "CCMQ0-cHGAAiEwjR8Lip37iXAxUJ19IEHQE5OQrKAQTPXLfl",
+                "modalEndpoint": {
+                 "modal": {
+                  "modalWithTitleAndButtonRenderer": {
+                   "title": {
+                    "runs": [
+                     {
+                      "text": "Save this for later"
+                     }
+                    ]
+                   },
+                   "content": {
+                    "runs": [
+                     {
+                      "text": "Make playlists and share them after signing in"
+                     }
+                    ]
+                   },
+                   "button": {
+                    "buttonRenderer": {
+                     "style": "STYLE_BLUE_TEXT",
+                     "isDisabled": false,
+                     "text": {
+                      "runs": [
+                       {
+                        "text": "Sign in"
+                       }
+                      ]
+                     },
+                     "navigationEndpoint": {
+                      "clickTrackingParams": "CCQQ8FsiEwjR8Lip37iXAxUJ19IEHQE5OQrKAQTPXLfl",
+                      "signInEndpoint": {
+                       "hack": true
+                      }
+                     },
+                     "trackingParams": "CCQQ8FsiEwjR8Lip37iXAxUJ19IEHQE5OQo="
+                    }
+                   }
+                  }
+                 }
+                },
+                "saveQueueToPlaylistCommand": {}
+               },
+               "trackingParams": "CCMQ0-cHGAAiEwjR8Lip37iXAxUJ19IEHQE5OQo=",
+               "icon": {
+                "iconType": "ADD_TO_PLAYLIST"
+               },
+               "accessibilityData": {
+                "accessibilityData": {
+                 "label": "Save"
+                }
+               },
+               "isSelected": false,
+               "uniqueId": "Save"
+              }
+             }
+            ],
+            "trackingParams": "CCIQ0ecHIhMI0fC4qd-4lwMVCdfSBB0BOTkK"
+           }
+          },
+          "subHeaderChipCloud": {
+           "chipCloudRenderer": {
+            "chips": [
+             {
+              "chipCloudChipRenderer": {
+               "text": {
+                "runs": [
+                 {
+                  "text": "All"
+                 }
+                ]
+               },
+               "navigationEndpoint": {
+                "clickTrackingParams": "CCEQ_V0YACITCNHwuKnfuJcDFQnX0gQdATk5CsoBBM9ct-U=",
+                "queueUpdateCommand": {
+                 "queueUpdateSection": "QUEUE_UPDATE_SECTION_QUEUE",
+                 "fetchContentsCommand": {
+                  "clickTrackingParams": "CCEQ_V0YACITCNHwuKnfuJcDFQnX0gQdATk5CsoBBM9ct-U=",
+                  "watchEndpoint": {
+                   "playlistId": "RDAMVM9HZ_tx8aWuA",
+                   "params": "ggUMRWdBWUFRJTNEJTNE",
+                   "loggingContext": {
+                    "vssLoggingContext": {
+                     "serializedContextData": "GhFSREFNVk05SFpfdHg4YVd1QQ%3D%3D"
+                    }
+                   }
+                  }
+                 },
+                 "dedupeAgainstLocalQueue": true,
+                 "syncMode": "QUEUE_UPDATE_SYNC_MODE_DEDUPE_AGAINST_LOCAL"
+                }
+               },
+               "trackingParams": "CCEQ_V0YACITCNHwuKnfuJcDFQnX0gQdATk5Cg==",
+               "accessibilityData": {
+                "accessibilityData": {
+                 "label": "All"
+                }
+               },
+               "isSelected": true,
+               "uniqueId": "All"
+              }
+             },
+             {
+              "chipCloudChipRenderer": {
+               "text": {
+                "runs": [
+                 {
+                  "text": "Popular"
+                 }
+                ]
+               },
+               "navigationEndpoint": {
+                "clickTrackingParams": "CCAQ_V0YASITCNHwuKnfuJcDFQnX0gQdATk5CsoBBM9ct-U=",
+                "queueUpdateCommand": {
+                 "queueUpdateSection": "QUEUE_UPDATE_SECTION_QUEUE",
+                 "fetchContentsCommand": {
+                  "clickTrackingParams": "CCAQ_V0YASITCNHwuKnfuJcDFQnX0gQdATk5CsoBBM9ct-U=",
+                  "watchEndpoint": {
+                   "playlistId": "RDATpYv9HZ_tx8aWuA",
+                   "params": "ggU4Q2hKU1JFRlVjRmwyT1VoYVgzUjRPR0ZYZFVFWUN5SU5DZ2RRYjNCMWJHRnlHZ0psYmclM0QlM0Q%3D",
+                   "loggingContext": {
+                    "vssLoggingContext": {
+                     "serializedContextData": "GhJSREFUcFl2OUhaX3R4OGFXdUE%3D"
+                    }
+                   }
+                  }
+                 },
+                 "dedupeAgainstLocalQueue": true,
+                 "syncMode": "QUEUE_UPDATE_SYNC_MODE_DEDUPE_AGAINST_LOCAL"
+                }
+               },
+               "trackingParams": "CCAQ_V0YASITCNHwuKnfuJcDFQnX0gQdATk5Cg==",
+               "accessibilityData": {
+                "accessibilityData": {
+                 "label": "Popular"
+                }
+               },
+               "isSelected": false,
+               "uniqueId": "Popular"
+              }
+             },
+             {
+              "chipCloudChipRenderer": {
+               "text": {
+                "runs": [
+                 {
+                  "text": "Discover"
+                 }
+                ]
+               },
+               "navigationEndpoint": {
+                "clickTrackingParams": "CB8Q_V0YAiITCNHwuKnfuJcDFQnX0gQdATk5CsoBBM9ct-U=",
+                "queueUpdateCommand": {
+                 "queueUpdateSection": "QUEUE_UPDATE_SECTION_QUEUE",
+                 "fetchContentsCommand": {
+                  "clickTrackingParams": "CB8Q_V0YAiITCNHwuKnfuJcDFQnX0gQdATk5CsoBBM9ct-U=",
+                  "watchEndpoint": {
+                   "playlistId": "RDATiXv9HZ_tx8aWuA",
+                   "params": "ggU2Q2hKU1JFRlVhVmgyT1VoYVgzUjRPR0ZYZFVFWUN5SU9DZ2hFYVhOamIzWmxjaG9DWlc0JTNE",
+                   "loggingContext": {
+                    "vssLoggingContext": {
+                     "serializedContextData": "GhJSREFUaVh2OUhaX3R4OGFXdUE%3D"
+                    }
+                   }
+                  }
+                 },
+                 "dedupeAgainstLocalQueue": true,
+                 "syncMode": "QUEUE_UPDATE_SYNC_MODE_DEDUPE_AGAINST_LOCAL"
+                }
+               },
+               "trackingParams": "CB8Q_V0YAiITCNHwuKnfuJcDFQnX0gQdATk5Cg==",
+               "accessibilityData": {
+                "accessibilityData": {
+                 "label": "Discover"
+                }
+               },
+               "isSelected": false,
+               "uniqueId": "Discover"
+              }
+             },
+             {
+              "chipCloudChipRenderer": {
+               "text": {
+                "runs": [
+                 {
+                  "text": "Deep cuts"
+                 }
+                ]
+               },
+               "navigationEndpoint": {
+                "clickTrackingParams": "CB4Q_V0YAyITCNHwuKnfuJcDFQnX0gQdATk5CsoBBM9ct-U=",
+                "queueUpdateCommand": {
+                 "queueUpdateSection": "QUEUE_UPDATE_SECTION_QUEUE",
+                 "fetchContentsCommand": {
+                  "clickTrackingParams": "CB4Q_V0YAyITCNHwuKnfuJcDFQnX0gQdATk5CsoBBM9ct-U=",
+                  "watchEndpoint": {
+                   "playlistId": "RDATpXv9HZ_tx8aWuA",
+                   "params": "ggU0Q2hKU1JFRlVjRmgyT1VoYVgzUjRPR0ZYZFVFWUN5SVBDZ2xFWldWd0lHTjFkSE1hQW1WdQ%3D%3D",
+                   "loggingContext": {
+                    "vssLoggingContext": {
+                     "serializedContextData": "GhJSREFUcFh2OUhaX3R4OGFXdUE%3D"
+                    }
+                   }
+                  }
+                 },
+                 "dedupeAgainstLocalQueue": true,
+                 "syncMode": "QUEUE_UPDATE_SYNC_MODE_DEDUPE_AGAINST_LOCAL"
+                }
+               },
+               "trackingParams": "CB4Q_V0YAyITCNHwuKnfuJcDFQnX0gQdATk5Cg==",
+               "accessibilityData": {
+                "accessibilityData": {
+                 "label": "Deep cuts"
+                }
+               },
+               "isSelected": false,
+               "uniqueId": "Deep cuts"
+              }
+             },
+             {
+              "chipCloudChipRenderer": {
+               "text": {
+                "runs": [
+                 {
+                  "text": "Pump-up"
+                 }
+                ]
+               },
+               "navigationEndpoint": {
+                "clickTrackingParams": "CB0Q_V0YBCITCNHwuKnfuJcDFQnX0gQdATk5CsoBBM9ct-U=",
+                "queueUpdateCommand": {
+                 "queueUpdateSection": "QUEUE_UPDATE_SECTION_QUEUE",
+                 "fetchContentsCommand": {
+                  "clickTrackingParams": "CB0Q_V0YBCITCNHwuKnfuJcDFQnX0gQdATk5CsoBBM9ct-U=",
+                  "watchEndpoint": {
+                   "playlistId": "RDATmYv9HZ_tx8aWuA",
+                   "params": "ggU4Q2hKU1JFRlViVmwyT1VoYVgzUjRPR0ZYZFVFWUN5SU5DZ2RRZFcxd0xYVndHZ0psYmclM0QlM0Q%3D",
+                   "loggingContext": {
+                    "vssLoggingContext": {
+                     "serializedContextData": "GhJSREFUbVl2OUhaX3R4OGFXdUE%3D"
+                    }
+                   }
+                  }
+                 },
+                 "dedupeAgainstLocalQueue": true,
+                 "syncMode": "QUEUE_UPDATE_SYNC_MODE_DEDUPE_AGAINST_LOCAL"
+                }
+               },
+               "trackingParams": "CB0Q_V0YBCITCNHwuKnfuJcDFQnX0gQdATk5Cg==",
+               "accessibilityData": {
+                "accessibilityData": {
+                 "label": "Pump-up"
+                }
+               },
+               "isSelected": false,
+               "uniqueId": "Pump-up"
+              }
+             },
+             {
+              "chipCloudChipRenderer": {
+               "text": {
+                "runs": [
+                 {
+                  "text": "1990s"
+                 }
+                ]
+               },
+               "navigationEndpoint": {
+                "clickTrackingParams": "CBwQ_V0YBSITCNHwuKnfuJcDFQnX0gQdATk5CsoBBM9ct-U=",
+                "queueUpdateCommand": {
+                 "queueUpdateSection": "QUEUE_UPDATE_SECTION_QUEUE",
+                 "fetchContentsCommand": {
+                  "clickTrackingParams": "CBwQ_V0YBSITCNHwuKnfuJcDFQnX0gQdATk5CsoBBM9ct-U=",
+                  "watchEndpoint": {
+                   "playlistId": "RDATd_v9HZ_tx8aWuA",
+                   "params": "ggUyQ2hKU1JFRlVaRjkyT1VoYVgzUjRPR0ZYZFVFWUN5SUxDZ1V4T1Rrd2N4b0NaVzQlM0Q%3D",
+                   "loggingContext": {
+                    "vssLoggingContext": {
+                     "serializedContextData": "GhJSREFUZF92OUhaX3R4OGFXdUE%3D"
+                    }
+                   }
+                  }
+                 },
+                 "dedupeAgainstLocalQueue": true,
+                 "syncMode": "QUEUE_UPDATE_SYNC_MODE_DEDUPE_AGAINST_LOCAL"
+                }
+               },
+               "trackingParams": "CBwQ_V0YBSITCNHwuKnfuJcDFQnX0gQdATk5Cg==",
+               "accessibilityData": {
+                "accessibilityData": {
+                 "label": "1990s"
+                }
+               },
+               "isSelected": false,
+               "uniqueId": "1990s"
+              }
+             },
+             {
+              "chipCloudChipRenderer": {
+               "text": {
+                "runs": [
+                 {
+                  "text": "1980s"
+                 }
+                ]
+               },
+               "navigationEndpoint": {
+                "clickTrackingParams": "CBsQ_V0YBiITCNHwuKnfuJcDFQnX0gQdATk5CsoBBM9ct-U=",
+                "queueUpdateCommand": {
+                 "queueUpdateSection": "QUEUE_UPDATE_SECTION_QUEUE",
+                 "fetchContentsCommand": {
+                  "clickTrackingParams": "CBsQ_V0YBiITCNHwuKnfuJcDFQnX0gQdATk5CsoBBM9ct-U=",
+                  "watchEndpoint": {
+                   "playlistId": "RDATdzv9HZ_tx8aWuA",
+                   "params": "ggUyQ2hKU1JFRlVaSHAyT1VoYVgzUjRPR0ZYZFVFWUN5SUxDZ1V4T1Rnd2N4b0NaVzQlM0Q%3D",
+                   "playerParams": "0gcJCWoAt9Zurpe2",
+                   "loggingContext": {
+                    "vssLoggingContext": {
+                     "serializedContextData": "GhJSREFUZHp2OUhaX3R4OGFXdUE%3D"
+                    }
+                   }
+                  }
+                 },
+                 "dedupeAgainstLocalQueue": true,
+                 "syncMode": "QUEUE_UPDATE_SYNC_MODE_DEDUPE_AGAINST_LOCAL"
+                }
+               },
+               "trackingParams": "CBsQ_V0YBiITCNHwuKnfuJcDFQnX0gQdATk5Cg==",
+               "accessibilityData": {
+                "accessibilityData": {
+                 "label": "1980s"
+                }
+               },
+               "isSelected": false,
+               "uniqueId": "1980s"
+              }
+             },
+             {
+              "chipCloudChipRenderer": {
+               "text": {
+                "runs": [
+                 {
+                  "text": "Rock"
+                 }
+                ]
+               },
+               "navigationEndpoint": {
+                "clickTrackingParams": "CBoQ_V0YByITCNHwuKnfuJcDFQnX0gQdATk5CsoBBM9ct-U=",
+                "queueUpdateCommand": {
+                 "queueUpdateSection": "QUEUE_UPDATE_SECTION_QUEUE",
+                 "fetchContentsCommand": {
+                  "clickTrackingParams": "CBoQ_V0YByITCNHwuKnfuJcDFQnX0gQdATk5CsoBBM9ct-U=",
+                  "watchEndpoint": {
+                   "playlistId": "RDATgFXv9HZ_tx8aWuA",
+                   "params": "ggUyQ2hOU1JFRlVaMFpZZGpsSVdsOTBlRGhoVjNWQkdBc2lDZ29FVW05amF4b0NaVzQlM0Q%3D",
+                   "loggingContext": {
+                    "vssLoggingContext": {
+                     "serializedContextData": "GhNSREFUZ0ZYdjlIWl90eDhhV3VB"
+                    }
+                   }
+                  }
+                 },
+                 "dedupeAgainstLocalQueue": true,
+                 "syncMode": "QUEUE_UPDATE_SYNC_MODE_DEDUPE_AGAINST_LOCAL"
+                }
+               },
+               "trackingParams": "CBoQ_V0YByITCNHwuKnfuJcDFQnX0gQdATk5Cg==",
+               "accessibilityData": {
+                "accessibilityData": {
+                 "label": "Rock"
+                }
+               },
+               "isSelected": false,
+               "uniqueId": "Rock"
+              }
+             },
+             {
+              "chipCloudChipRenderer": {
+               "text": {
+                "runs": [
+                 {
+                  "text": "Metal"
+                 }
+                ]
+               },
+               "navigationEndpoint": {
+                "clickTrackingParams": "CBkQ_V0YCCITCNHwuKnfuJcDFQnX0gQdATk5CsoBBM9ct-U=",
+                "queueUpdateCommand": {
+                 "queueUpdateSection": "QUEUE_UPDATE_SECTION_QUEUE",
+                 "fetchContentsCommand": {
+                  "clickTrackingParams": "CBkQ_V0YCCITCNHwuKnfuJcDFQnX0gQdATk5CsoBBM9ct-U=",
+                  "watchEndpoint": {
+                   "playlistId": "RDATg6Xv9HZ_tx8aWuA",
+                   "params": "ggUwQ2hOU1JFRlVaelpZZGpsSVdsOTBlRGhoVjNWQkdBc2lDd29GVFdWMFlXd2FBbVZ1",
+                   "loggingContext": {
+                    "vssLoggingContext": {
+                     "serializedContextData": "GhNSREFUZzZYdjlIWl90eDhhV3VB"
+                    }
+                   }
+                  }
+                 },
+                 "dedupeAgainstLocalQueue": true,
+                 "syncMode": "QUEUE_UPDATE_SYNC_MODE_DEDUPE_AGAINST_LOCAL"
+                }
+               },
+               "trackingParams": "CBkQ_V0YCCITCNHwuKnfuJcDFQnX0gQdATk5Cg==",
+               "accessibilityData": {
+                "accessibilityData": {
+                 "label": "Metal"
+                }
+               },
+               "isSelected": false,
+               "uniqueId": "Metal"
+              }
+             }
+            ],
+            "trackingParams": "CBgQ_F0iEwjR8Lip37iXAxUJ19IEHQE5OQo=",
+            "selectionBehavior": "CHIP_CLOUD_SELECTION_BEHAVIOR_SINGLE_SELECT_ALWAYS_SELECTED"
+           }
+          }
+         }
+        },
+        "trackingParams": "CBcQn7QFGAYiEwjR8Lip37iXAxUJ19IEHQE5OQo="
+       }
+      }
+     ]
+    }
+   }
+  }
+ }
+}
