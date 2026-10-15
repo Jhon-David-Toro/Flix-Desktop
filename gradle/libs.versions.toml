@@ -1,0 +1,31 @@
+[versions]
+kotlin = "2.4.21"
+composeMultiplatform = "1.12.1"
+composeMaterial3 = "1.9.0"
+lifecycle = "2.11.0"
+kotlinxCoroutines = "1.11.0"
+kotlinxSerialization = "1.11.0"
+okhttp = "5.5.0"
+newpipeExtractor = "v0.26.5"
+coil = "3.6.3"
+junit = "4.13.2"
+
+[libraries]
+compose-material3 = { group = "org.jetbrains.compose.material3", name = "material3", version.ref = "composeMaterial3" }
+compose-components-resources = { group = "org.jetbrains.compose.components", name = "components-resources", version.ref = "composeMultiplatform" }
+lifecycle-viewmodel-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle" }
+kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlinxCoroutines" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+newpipe-extractor = { group = "com.github.TeamNewPipe", name = "NewPipeExtractor", version.ref = "newpipeExtractor" }
+coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
