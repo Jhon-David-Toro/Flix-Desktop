@@ -178,4 +178,40 @@ class DesktopPlayerControllerTest {
         assertEquals("r1", player.state.value.current?.id)
         assertEquals("local/r1", engine.loads.last().first)
     }
+
+    @Test
+    fun `una sesión guardada vuelve en pausa en su segundo y no carga hasta darle a reproducir`() = runTest {
+        val first = controller()
+        first.play(songs, startIndex = 1, source = PlaybackSource.Playlist("Noches de ruta"))
+        signal(AudioSignal.Position(83.0))
+        first.cycleRepeatMode()
+        val session = requireNotNull(first.session())
+
+        val second = controller()
+        second.restore(session)
+
+        assertEquals("b", second.state.value.current?.id)
+        assertEquals(PlaybackStatus.Paused, second.state.value.status)
+        assertEquals(83.seconds, second.state.value.position)
+        assertEquals(RepeatMode.All, second.state.value.repeatMode)
+        assertEquals(PlaybackSource.Playlist("Noches de ruta"), second.state.value.source)
+        assertTrue(engine.loads.isEmpty())
+
+        second.togglePlayPause()
+
+        assertEquals("local/b" to 83.0, engine.loads.single())
+    }
+
+    @Test
+    fun `la cola aleatoria guardada recupera su orden original al quitar el aleatorio`() = runTest {
+        val first = controller()
+        first.play(songs, startIndex = 0, source = PlaybackSource.Favorites, shuffle = true)
+        val session = requireNotNull(first.session())
+
+        val second = controller()
+        second.restore(session)
+        second.toggleShuffle()
+
+        assertEquals(listOf("b", "c"), second.state.value.upNext.map { item -> item.track.id })
+    }
 }

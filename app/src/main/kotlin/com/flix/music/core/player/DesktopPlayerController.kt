@@ -55,6 +55,9 @@ class DesktopPlayerController(
     private var publishedPosition: Duration = Duration.ZERO
     private var recordedCurrent = false
 
+    /** A restored session waits, paused, until play: nothing is fetched at launch. */
+    private var waitingToLoad = false
+
     override fun play(tracks: List<Track>, startIndex: Int, source: PlaybackSource, shuffle: Boolean) {
         if (tracks.isEmpty()) return
         this.source = source
@@ -98,6 +101,7 @@ class DesktopPlayerController(
     override fun togglePlayPause() {
         if (queue.current == null) return
         if (ended || failed) return retry()
+        if (waitingToLoad) return startCurrent(from = position)
         paused = !paused
         engine.setPaused(paused)
         publish()
@@ -106,6 +110,7 @@ class DesktopPlayerController(
     override fun seekTo(position: Duration) {
         if (queue.current == null) return
         this.position = position
+        if (waitingToLoad) return publish()
         engine.seek(position.inWholeMilliseconds / MILLIS_PER_SECOND)
         publish()
     }
@@ -144,6 +149,26 @@ class DesktopPlayerController(
 
     fun queuedTrackIds(): Set<String> = queue.trackIds
 
+    /** Where the music is now, to pick it up after Flix restarts; null with an empty queue. */
+    fun session(): PlayerSession? = queue.snapshot()?.let { snapshot -> PlayerSession.of(snapshot, position, source) }
+
+    /** Puts [session] back paused at its second, without loading the song until play. */
+    fun restore(session: PlayerSession) {
+        val snapshot = session.toSnapshot()
+        if (snapshot.tracks.isEmpty()) return
+        queue.restore(snapshot)
+        source = session.source()
+        position = session.position
+        duration = queue.current?.duration
+        paused = true
+        loading = false
+        ended = false
+        failed = false
+        recordedCurrent = true
+        waitingToLoad = true
+        publish()
+    }
+
     /** Shuffle and repeat as they were last time ("Recordar aleatorio y repetir"). */
     fun restoreModes(shuffle: Boolean, repeatMode: RepeatMode) = changeQueue {
         queue.repeatMode = repeatMode
@@ -172,6 +197,7 @@ class DesktopPlayerController(
     private fun startCurrent(from: Duration = Duration.ZERO) {
         val current = queue.current ?: return
         if (from == Duration.ZERO) recordedCurrent = false
+        waitingToLoad = false
         position = from
         publishedPosition = from
         duration = current.duration

@@ -1,5 +1,6 @@
 package com.flix.music
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -12,7 +13,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Tray
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
@@ -25,7 +25,6 @@ import com.flix.music.core.designsystem.theme.FlixTheme
 import com.flix.music.core.designsystem.theme.ThemeMode
 import com.flix.music.core.model.AppTheme
 import com.flix.music.core.model.PlaybackModes
-import com.flix.music.core.player.PlaybackStatus
 import com.flix.music.core.player.RepeatMode
 import com.flix.music.core.system.MediaKey
 import com.flix.music.core.system.MediaKeys
@@ -34,21 +33,20 @@ import com.flix.music.core.system.WindowMemoryStore
 import com.flix.music.core.system.WindowsAutostart
 import com.flix.music.core.system.installFileLogging
 import com.flix.music.core.ui.LocalAppGraph
+import com.flix.music.core.ui.window.FlixTray
 import com.flix.music.core.ui.window.LocalWindowFrame
+import com.flix.music.core.ui.window.TrayMenuItem
 import com.flix.music.core.ui.window.WindowFrame
 import com.flix.music.core.ui.window.WindowSurface
 import com.flix.music.core.ui.window.roundCornersOnWindows11
 import com.flix.music.resources.Res
 import com.flix.music.resources.flix_icon
-import com.flix.music.resources.player_next
-import com.flix.music.resources.player_pause
-import com.flix.music.resources.player_play
-import com.flix.music.resources.player_previous
 import com.flix.music.resources.tray_quit
 import com.flix.music.resources.tray_show
 import com.flix.music.ui.FlixDesktopApp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
@@ -63,7 +61,9 @@ import java.io.File
 
 /**
  * Starts Flix: the log first, then one instance only (a second launch brings this
- * window forward), the window as it was left, the tray icon and the media keys.
+ * window forward), the window as it was left, the music where it was, the tray icon
+ * and the media keys. Closing the window keeps Flix playing in the tray; "Salir de
+ * Flix" there saves the session and quits.
  */
 @OptIn(FlowPreview::class)
 fun main(args: Array<String>) {
@@ -84,6 +84,7 @@ fun main(args: Array<String>) {
         val playerState by graph.player.state.collectAsState()
         var volume by remember { mutableIntStateOf(remembered.volume) }
         var composeWindow by remember { mutableStateOf<ComposeWindow?>(null) }
+        var windowVisible by remember { mutableStateOf(true) }
         val windowState = rememberWindowState(
             placement = if (remembered.maximized) WindowPlacement.Maximized else WindowPlacement.Floating,
             position = if (remembered.x != null && remembered.y != null) WindowPosition(remembered.x.dp, remembered.y.dp) else WindowPosition.PlatformDefault,
@@ -91,13 +92,15 @@ fun main(args: Array<String>) {
             isMinimized = WindowsAutostart.MINIMIZED_ARGUMENT in args,
         )
         val showWindow = {
+            windowVisible = true
             windowState.isMinimized = false
-            composeWindow?.isVisible = true
             composeWindow?.toFront()
             composeWindow?.requestFocus()
             Unit
         }
+        val hideToTray = { windowVisible = false }
         val closeApp = {
+            graph.sessionStore.write(graph.player.session())
             windowMemoryStore.write(windowMemoryStore.read().copy(volume = volume))
             instance.release()
             graph.close()
@@ -107,6 +110,13 @@ fun main(args: Array<String>) {
         LaunchedEffect(graph) {
             launch(Dispatchers.IO) { graph.newPipeSetup.warmUp() }
             graph.player.setVolume(volume)
+            graph.sessionStore.read()?.let(graph.player::restore)
+            launch {
+                while (true) {
+                    delay(SESSION_SAVE_MILLIS)
+                    graph.player.session()?.let { session -> launch(Dispatchers.IO) { graph.sessionStore.write(session) } }
+                }
+            }
             instance.listen { graph.applicationScope.launch { showWindow() } }
             MediaKeys { key ->
                 graph.applicationScope.launch {
@@ -150,34 +160,32 @@ fun main(args: Array<String>) {
                 }
         }
 
-        Tray(
+        val isDark = when (settings?.theme) {
+            AppTheme.Dark -> true
+            AppTheme.Light -> false
+            else -> isSystemInDarkTheme()
+        }
+        FlixTray(
             icon = painterResource(Res.drawable.flix_icon),
             tooltip = playerState.current?.let { track -> "${track.title} · ${track.artistNames}" } ?: "Flix",
-            onAction = showWindow,
-            menu = {
-                Item(stringResource(Res.string.tray_show), onClick = showWindow)
-                Separator()
-                Item(
-                    stringResource(if (playerState.status == PlaybackStatus.Playing) Res.string.player_pause else Res.string.player_play),
-                    enabled = playerState.current != null,
-                    onClick = graph.player::togglePlayPause,
-                )
-                Item(stringResource(Res.string.player_next), enabled = playerState.hasNext, onClick = graph.player::skipToNext)
-                Item(stringResource(Res.string.player_previous), enabled = playerState.current != null, onClick = graph.player::skipToPrevious)
-                Separator()
-                Item(stringResource(Res.string.tray_quit), onClick = closeApp)
-            },
+            isDark = isDark,
+            onShow = showWindow,
+            items = listOf(
+                TrayMenuItem(stringResource(Res.string.tray_show), showWindow),
+                TrayMenuItem(stringResource(Res.string.tray_quit), closeApp),
+            ),
         )
 
         Window(
-            onCloseRequest = closeApp,
+            onCloseRequest = hideToTray,
+            visible = windowVisible,
             title = playerState.current?.let { track -> "${track.title} · Flix" } ?: "Flix",
             icon = painterResource(Res.drawable.flix_icon),
             state = windowState,
             undecorated = true,
         ) {
             val frame = remember(window) {
-                WindowFrame(window, windowState, onMinimize = { windowState.isMinimized = true }, onClose = closeApp)
+                WindowFrame(window, windowState, onMinimize = { windowState.isMinimized = true }, onClose = hideToTray)
             }
             LaunchedEffect(window) {
                 composeWindow = window
@@ -209,5 +217,6 @@ private fun AppTheme.toThemeMode(): ThemeMode = when (this) {
 
 private const val IMAGE_CACHE_BYTES = 256L * 1024 * 1024
 private const val SAVE_DELAY_MILLIS = 500L
+private const val SESSION_SAVE_MILLIS = 15_000L
 private const val MIN_WIDTH = 960
 private const val MIN_HEIGHT = 640

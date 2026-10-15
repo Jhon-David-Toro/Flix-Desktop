@@ -38,6 +38,7 @@ import com.flix.music.core.data.youtube.NewPipeSetup
 import com.flix.music.core.data.youtube.YouTubeMusicClient
 import com.flix.music.core.player.DesktopAutoplay
 import com.flix.music.core.player.DesktopPlayerController
+import com.flix.music.core.player.PlayerSessionStore
 import com.flix.music.core.player.mpv.MpvEngine
 import com.flix.music.core.player.stream.AudioServer
 import com.flix.music.core.player.stream.NewPipeStreamResolver
@@ -140,6 +141,9 @@ class AppGraph(val dataDirectory: File = defaultDataDirectory()) {
     )
 
     private val autostart = WindowsAutostart()
+
+    /** Where the music was when Flix last closed. */
+    val sessionStore = PlayerSessionStore(File(dataDirectory, "session.json"), json)
 
     private val autoplay = DesktopAutoplay(
         player = player,

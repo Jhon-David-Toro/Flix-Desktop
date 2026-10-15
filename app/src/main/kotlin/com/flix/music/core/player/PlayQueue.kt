@@ -42,6 +42,28 @@ class PlayQueue(private val random: Random = Random.Default) {
 
     val hasPrevious: Boolean get() = currentIndex > 0 || (repeatMode == RepeatMode.All && entries.isNotEmpty())
 
+    /** Everything needed to rebuild this queue later, in play order. */
+    data class Snapshot(
+        val tracks: List<Track>,
+        val currentIndex: Int,
+        val repeatMode: RepeatMode,
+        /** With shuffle on, the original order as indexes into [tracks]; null otherwise. */
+        val unshuffledOrder: List<Int>?,
+    )
+
+    fun snapshot(): Snapshot? {
+        if (entries.isEmpty()) return null
+        val unshuffledOrder = unshuffled?.mapNotNull { kept -> entries.indexOfFirst { entry -> entry.key == kept.key }.takeIf { index -> index >= 0 } }
+        return Snapshot(entries.map(Entry::track), currentIndex, repeatMode, unshuffledOrder)
+    }
+
+    fun restore(snapshot: Snapshot) {
+        entries = snapshot.tracks.map(::newEntry).toMutableList()
+        currentIndex = snapshot.currentIndex.coerceIn(entries.indices)
+        repeatMode = snapshot.repeatMode
+        unshuffled = snapshot.unshuffledOrder?.mapNotNull(entries::getOrNull)
+    }
+
     fun replace(tracks: List<Track>, startIndex: Int, shuffle: Boolean) {
         entries = tracks.map(::newEntry).toMutableList()
         unshuffled = null
