@@ -39,6 +39,7 @@ dependencies {
 
 tasks.test {
     systemProperty("flix.liveTests", providers.gradleProperty("liveTests").getOrElse("false"))
+    systemProperty("flix.exportIcon", providers.gradleProperty("exportIcon").getOrElse("false"))
     systemProperty("compose.application.resources.dir", layout.projectDirectory.dir("resources/windows").asFile.absolutePath)
 }
 
@@ -61,6 +62,28 @@ compose.desktop {
             packageVersion = "1.0.0"
             description = "Flix Music para escritorio"
             vendor = "Jhon David Toro"
+            copyright = "© 2026 Jhon David Toro. GPL-3.0."
+            licenseFile.set(rootProject.file("LICENSE"))
+            modules(
+                "java.instrument",
+                "java.logging",
+                "java.naming",
+                "java.net.http",
+                "jdk.crypto.ec",
+                "jdk.dynalink",
+                "jdk.httpserver",
+                "jdk.localedata",
+                "jdk.unsupported",
+            )
+            windows {
+                iconFile.set(project.file("icons/flix.ico"))
+                menuGroup = "Flix"
+                menu = true
+                shortcut = true
+                perUserInstall = true
+                dirChooser = true
+                upgradeUuid = "db182a06-de11-4503-8f58-d68d27313407"
+            }
         }
     }
 }
