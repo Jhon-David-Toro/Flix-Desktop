@@ -38,6 +38,9 @@ import com.flix.music.core.designsystem.component.LocalSnackbarHostState
 import com.flix.music.core.designsystem.component.handCursor
 import com.flix.music.core.designsystem.theme.FlixTheme
 import com.flix.music.core.ui.LocalAppGraph
+import com.flix.music.core.ui.window.TITLE_BAR_HEIGHT
+import com.flix.music.core.ui.window.WindowButtons
+import com.flix.music.core.ui.window.WindowDragArea
 import com.flix.music.feature.player.PlayerBar
 import com.flix.music.feature.player.PlayerBarActions
 import com.flix.music.feature.search.SearchScreen
@@ -97,26 +100,44 @@ fun FlixDesktopApp() {
         ) {
             Row(Modifier.weight(1f)) {
                 SideMenu(selected = section, onSelect = { section = it })
-                Box(
-                    modifier = Modifier
+                Column(
+                    Modifier
                         .weight(1f)
                         .fillMaxHeight(),
-                    contentAlignment = Alignment.Center,
                 ) {
-                    when (section) {
-                        Section.Search -> SearchScreen(onGenreClick = {}, modifier = Modifier.fillMaxSize())
-                        else -> Text(
-                            text = stringResource(section.label),
-                            style = FlixTheme.typography.headline,
-                            color = FlixTheme.colors.textPrimary,
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(TITLE_BAR_HEIGHT),
+                    ) {
+                        WindowDragArea(
+                            Modifier
+                                .weight(1f)
+                                .fillMaxHeight(),
                         )
+                        WindowButtons()
                     }
-                    SnackbarHost(
-                        hostState = snackbarHostState,
+                    Box(
                         modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(FlixTheme.spacing.lg),
-                    ) { data -> FlixSnackbar(data) }
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        when (section) {
+                            Section.Search -> SearchScreen(onGenreClick = {}, modifier = Modifier.fillMaxSize())
+                            else -> Text(
+                                text = stringResource(section.label),
+                                style = FlixTheme.typography.headline,
+                                color = FlixTheme.colors.textPrimary,
+                            )
+                        }
+                        SnackbarHost(
+                            hostState = snackbarHostState,
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .padding(FlixTheme.spacing.lg),
+                        ) { data -> FlixSnackbar(data) }
+                    }
                 }
             }
             PlayerBar(state = playerState, volume = volume, actions = playerActions)
@@ -131,10 +152,16 @@ private fun SideMenu(selected: Section, onSelect: (Section) -> Unit) {
             .width(SIDE_MENU_WIDTH)
             .fillMaxHeight()
             .background(FlixTheme.colors.surface)
-            .padding(horizontal = FlixTheme.spacing.md, vertical = FlixTheme.spacing.xxl),
+            .padding(horizontal = FlixTheme.spacing.md),
         verticalArrangement = Arrangement.spacedBy(FlixTheme.spacing.xs),
     ) {
-        Wordmark(Modifier.padding(start = FlixTheme.spacing.md, bottom = FlixTheme.spacing.xxl))
+        WindowDragArea(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(WORDMARK_AREA_HEIGHT)
+                .padding(start = FlixTheme.spacing.md, bottom = FlixTheme.spacing.sm),
+            contentAlignment = Alignment.BottomStart,
+        ) { Wordmark() }
         Section.entries.forEach { entry ->
             SideMenuItem(section = entry, isSelected = entry == selected, onClick = { onSelect(entry) })
         }
@@ -185,5 +212,6 @@ private fun SideMenuItem(section: Section, isSelected: Boolean, onClick: () -> U
 }
 
 private val SIDE_MENU_WIDTH = 232.dp
+private val WORDMARK_AREA_HEIGHT = 88.dp
 private const val DEFAULT_VOLUME = 100
 private val SIDE_MENU_ITEM_HEIGHT = 44.dp
