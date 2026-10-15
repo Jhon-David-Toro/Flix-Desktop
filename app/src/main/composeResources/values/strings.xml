@@ -58,6 +58,7 @@
     <string name="player_repeat_off">Desactivado</string>
     <string name="player_repeat_all">Toda la cola</string>
     <string name="player_repeat_one">Esta canción</string>
+    <string name="player_volume">Volumen</string>
     <string name="player_seek">Posición de la canción</string>
     <string name="player_up_next">A continuación</string>
     <string name="player_error">No pudimos reproducir esta canción ahora.</string>

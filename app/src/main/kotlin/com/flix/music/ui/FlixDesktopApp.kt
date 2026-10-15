@@ -15,10 +15,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -27,7 +32,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.flix.music.core.designsystem.component.FlixSnackbar
+import com.flix.music.core.designsystem.component.LocalSnackbarHostState
 import com.flix.music.core.designsystem.theme.FlixTheme
+import com.flix.music.core.ui.LocalAppGraph
+import com.flix.music.feature.player.PlayerBar
+import com.flix.music.feature.player.PlayerBarActions
+import com.flix.music.feature.search.SearchScreen
 import com.flix.music.resources.Res
 import com.flix.music.resources.ic_home
 import com.flix.music.resources.ic_home_filled
@@ -55,20 +67,58 @@ enum class Section(val label: StringResource, val icon: DrawableResource, val se
  */
 @Composable
 fun FlixDesktopApp() {
+    val graph = LocalAppGraph.current
+    val player = graph.player
+    val playerState by player.state.collectAsStateWithLifecycle()
     var section by rememberSaveable { mutableStateOf(Section.Home) }
-    Row(
-        Modifier
-            .fillMaxSize()
-            .background(FlixTheme.colors.background),
-    ) {
-        SideMenu(selected = section, onSelect = { section = it })
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
-            contentAlignment = Alignment.Center,
+    var volume by rememberSaveable { mutableIntStateOf(DEFAULT_VOLUME) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val playerActions = remember(player) {
+        PlayerBarActions(
+            onPlayPause = player::togglePlayPause,
+            onPrevious = player::skipToPrevious,
+            onNext = player::skipToNext,
+            onSeek = player::seekTo,
+            onToggleShuffle = player::toggleShuffle,
+            onCycleRepeat = player::cycleRepeatMode,
+            onVolumeChange = { percent ->
+                volume = percent
+                player.setVolume(percent)
+            },
+        )
+    }
+
+    CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .background(FlixTheme.colors.background),
         ) {
-            Text(stringResource(section.label), style = FlixTheme.typography.headline, color = FlixTheme.colors.textPrimary)
+            Row(Modifier.weight(1f)) {
+                SideMenu(selected = section, onSelect = { section = it })
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    when (section) {
+                        Section.Search -> SearchScreen(onGenreClick = {}, modifier = Modifier.fillMaxSize())
+                        else -> Text(
+                            text = stringResource(section.label),
+                            style = FlixTheme.typography.headline,
+                            color = FlixTheme.colors.textPrimary,
+                        )
+                    }
+                    SnackbarHost(
+                        hostState = snackbarHostState,
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(FlixTheme.spacing.lg),
+                    ) { data -> FlixSnackbar(data) }
+                }
+            }
+            PlayerBar(state = playerState, volume = volume, actions = playerActions)
         }
     }
 }
@@ -134,4 +184,5 @@ private fun SideMenuItem(section: Section, isSelected: Boolean, onClick: () -> U
 }
 
 private val SIDE_MENU_WIDTH = 232.dp
+private const val DEFAULT_VOLUME = 100
 private val SIDE_MENU_ITEM_HEIGHT = 44.dp
