@@ -21,6 +21,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -34,58 +35,99 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.flix.music.core.designsystem.component.FlixSnackbar
 import com.flix.music.core.designsystem.component.LocalSnackbarHostState
 import com.flix.music.core.designsystem.component.handCursor
 import com.flix.music.core.designsystem.theme.FlixTheme
+import com.flix.music.core.model.AlbumRef
+import com.flix.music.core.model.ArtistRef
+import com.flix.music.core.ui.DetailNavigator
+import com.flix.music.core.ui.ErrorShortcuts
 import com.flix.music.core.ui.LocalAppGraph
+import com.flix.music.core.ui.LocalDetailNavigator
+import com.flix.music.core.ui.LocalErrorShortcuts
 import com.flix.music.core.ui.window.TITLE_BAR_HEIGHT
 import com.flix.music.core.ui.window.WindowButtons
 import com.flix.music.core.ui.window.WindowDragArea
+import com.flix.music.feature.album.navigation.navigateToAlbum
+import com.flix.music.feature.artist.navigation.navigateToArtist
+import com.flix.music.feature.downloads.navigation.DownloadsRoute
+import com.flix.music.feature.downloads.navigation.navigateToDownloads
 import com.flix.music.feature.player.NowPlayingView
 import com.flix.music.feature.player.PlayerBar
 import com.flix.music.feature.player.PlayerBarActions
 import com.flix.music.feature.player.QueueActions
-import com.flix.music.feature.search.SearchScreen
-import com.flix.music.feature.settings.SettingsScreen
+import com.flix.music.feature.settings.navigation.SettingsRoute
+import com.flix.music.feature.settings.navigation.navigateToSettings
+import com.flix.music.feature.song.navigation.navigateToSong
+import com.flix.music.feature.trackmenu.TrackMenuHost
+import com.flix.music.navigation.FlixNavHost
+import com.flix.music.navigation.TopLevelDestination
+import com.flix.music.navigation.navigateToTopLevel
+import com.flix.music.navigation.openPlaylistInLibrary
 import com.flix.music.resources.Res
-import com.flix.music.resources.ic_home
-import com.flix.music.resources.ic_home_filled
-import com.flix.music.resources.ic_library_music
-import com.flix.music.resources.ic_library_music_filled
-import com.flix.music.resources.ic_search
+import com.flix.music.resources.ic_download
 import com.flix.music.resources.ic_settings
-import com.flix.music.resources.tab_home
-import com.flix.music.resources.tab_library
-import com.flix.music.resources.tab_search
+import com.flix.music.resources.profile_downloads
 import com.flix.music.resources.tab_settings
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
-/** The three sections of the side menu, the same as the phone's tabs. */
-enum class Section(val label: StringResource, val icon: DrawableResource, val selectedIcon: DrawableResource) {
-    Home(Res.string.tab_home, Res.drawable.ic_home, Res.drawable.ic_home_filled),
-    Search(Res.string.tab_search, Res.drawable.ic_search, Res.drawable.ic_search),
-    Library(Res.string.tab_library, Res.drawable.ic_library_music, Res.drawable.ic_library_music_filled),
-    Settings(Res.string.tab_settings, Res.drawable.ic_settings, Res.drawable.ic_settings),
+/** Where the side menu puts the user: the phone's three tabs, then Descargas and Ajustes at the bottom. */
+private sealed interface MenuEntry {
+    data class Tab(val destination: TopLevelDestination) : MenuEntry
+    data object Downloads : MenuEntry
+    data object Settings : MenuEntry
 }
 
 /**
  * Desktop layout of Flix: the phone's tabs become a side menu under the wordmark, the
- * screen fills the rest, and the player lives in a bar along the bottom.
+ * screens (the phone's own, with its navigation) fill the rest, the Now Playing view
+ * opens over them, and the player lives in a bar along the bottom.
  */
 @Composable
 fun FlixDesktopApp() {
     val graph = LocalAppGraph.current
     val player = graph.player
     val playerState by player.state.collectAsStateWithLifecycle()
-    var section by rememberSaveable { mutableStateOf(Section.Home) }
+    val navController = rememberNavController()
+    val currentEntry by navController.currentBackStackEntryAsState()
+    var lastTab by rememberSaveable { mutableStateOf(TopLevelDestination.Home) }
+    val selected = currentEntry?.let(::menuEntryOf) ?: MenuEntry.Tab(lastTab)
+    SideEffect { (selected as? MenuEntry.Tab)?.let { tab -> lastTab = tab.destination } }
     var volume by rememberSaveable { mutableIntStateOf(DEFAULT_VOLUME) }
     var nowPlayingOpen by rememberSaveable { mutableStateOf(false) }
     if (playerState.current == null) nowPlayingOpen = false
     val snackbarHostState = remember { SnackbarHostState() }
+
+    val detailNavigator = remember(navController) {
+        object : DetailNavigator {
+            override fun openSong(trackId: String) {
+                nowPlayingOpen = false
+                navController.navigateToSong(trackId)
+            }
+
+            override fun openArtist(artist: ArtistRef) {
+                nowPlayingOpen = false
+                navController.navigateToArtist(artist.id, artist.name)
+            }
+
+            override fun openAlbum(album: AlbumRef, artist: ArtistRef?) {
+                nowPlayingOpen = false
+                navController.navigateToAlbum(album.id, album.name, artist?.name.orEmpty(), artist?.id)
+            }
+        }
+    }
+    val errorShortcuts = remember(navController) {
+        ErrorShortcuts(openLibrary = { navController.navigateToTopLevel(TopLevelDestination.Library) })
+    }
     val playerActions = remember(player) {
         PlayerBarActions(
             onPlayPause = player::togglePlayPause,
@@ -98,9 +140,10 @@ fun FlixDesktopApp() {
                 volume = percent
                 player.setVolume(percent)
             },
+            onOpenPlayer = { nowPlayingOpen = !nowPlayingOpen },
         )
     }
-    val queueActions = remember(player) {
+    val queueActions = remember(player, navController) {
         QueueActions(
             onItemClick = { item -> player.skipToQueueItem(item.index) },
             onRemove = player::removeQueueItem,
@@ -109,84 +152,93 @@ fun FlixDesktopApp() {
             onClear = player::clearUpNext,
             onBrowseMusic = {
                 nowPlayingOpen = false
-                section = Section.Search
+                navController.navigateToTopLevel(TopLevelDestination.Search)
             },
         )
     }
 
-    CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .background(FlixTheme.colors.background),
-        ) {
-            Row(Modifier.weight(1f)) {
-                SideMenu(
-                    selected = section,
-                    onSelect = { selected ->
-                        section = selected
-                        nowPlayingOpen = false
-                    },
-                )
-                Column(
-                    Modifier
-                        .weight(1f)
-                        .fillMaxHeight(),
-                ) {
-                    Row(
+    CompositionLocalProvider(
+        LocalSnackbarHostState provides snackbarHostState,
+        LocalDetailNavigator provides detailNavigator,
+        LocalErrorShortcuts provides errorShortcuts,
+    ) {
+        TrackMenuHost(onOpenPlaylist = navController::openPlaylistInLibrary) {
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .background(FlixTheme.colors.background),
+            ) {
+                Row(Modifier.weight(1f)) {
+                    SideMenu(
+                        selected = selected,
+                        onSelect = { entry ->
+                            nowPlayingOpen = false
+                            when (entry) {
+                                is MenuEntry.Tab -> navController.navigateToTopLevel(entry.destination)
+                                MenuEntry.Downloads -> navController.navigateToDownloads()
+                                MenuEntry.Settings -> navController.navigateToSettings()
+                            }
+                        },
+                    )
+                    Column(
                         Modifier
-                            .fillMaxWidth()
-                            .height(TITLE_BAR_HEIGHT),
+                            .weight(1f)
+                            .fillMaxHeight(),
                     ) {
-                        WindowDragArea(
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(TITLE_BAR_HEIGHT),
+                        ) {
+                            WindowDragArea(
+                                Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight(),
+                            )
+                            WindowButtons()
+                        }
+                        Box(
                             Modifier
                                 .weight(1f)
-                                .fillMaxHeight(),
-                        )
-                        WindowButtons()
-                    }
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth(),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        when (section) {
-                            Section.Search -> SearchScreen(onGenreClick = {}, modifier = Modifier.fillMaxSize())
-                            Section.Settings -> SettingsScreen(modifier = Modifier.fillMaxSize())
-                            else -> Text(
-                                text = stringResource(section.label),
-                                style = FlixTheme.typography.headline,
-                                color = FlixTheme.colors.textPrimary,
-                            )
+                                .fillMaxWidth(),
+                        ) {
+                            FlixNavHost(navController = navController, modifier = Modifier.fillMaxSize())
+                            if (nowPlayingOpen) {
+                                NowPlayingView(
+                                    state = playerState,
+                                    queueActions = queueActions,
+                                    onClose = { nowPlayingOpen = false },
+                                )
+                            }
+                            SnackbarHost(
+                                hostState = snackbarHostState,
+                                modifier = Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .padding(FlixTheme.spacing.lg),
+                            ) { data -> FlixSnackbar(data) }
                         }
-                        if (nowPlayingOpen) {
-                            NowPlayingView(
-                                state = playerState,
-                                queueActions = queueActions,
-                                onClose = { nowPlayingOpen = false },
-                            )
-                        }
-                        SnackbarHost(
-                            hostState = snackbarHostState,
-                            modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                                .padding(FlixTheme.spacing.lg),
-                        ) { data -> FlixSnackbar(data) }
                     }
                 }
+                PlayerBar(state = playerState, volume = volume, actions = playerActions)
             }
-            PlayerBar(
-                state = playerState,
-                volume = volume,
-                actions = playerActions.copy(onOpenPlayer = { nowPlayingOpen = !nowPlayingOpen }),
-            )
         }
     }
 }
 
+/** The menu entry that owns [entry]: its tab graph, or Descargas / Ajustes; null for shared screens. */
+private fun menuEntryOf(entry: NavBackStackEntry): MenuEntry? {
+    val destination = entry.destination
+    return when {
+        destination.hasRoute(DownloadsRoute::class) -> MenuEntry.Downloads
+        destination.hasRoute(SettingsRoute::class) -> MenuEntry.Settings
+        else -> TopLevelDestination.entries
+            .firstOrNull { tab -> destination.hierarchy.any { ancestor -> ancestor.hasRoute(tab.route::class) } }
+            ?.let(MenuEntry::Tab)
+    }
+}
+
 @Composable
-private fun SideMenu(selected: Section, onSelect: (Section) -> Unit) {
+private fun SideMenu(selected: MenuEntry, onSelect: (MenuEntry) -> Unit) {
     Column(
         modifier = Modifier
             .width(SIDE_MENU_WIDTH)
@@ -202,11 +254,31 @@ private fun SideMenu(selected: Section, onSelect: (Section) -> Unit) {
                 .padding(start = FlixTheme.spacing.md, bottom = FlixTheme.spacing.sm),
             contentAlignment = Alignment.BottomStart,
         ) { Wordmark() }
-        Section.entries.filter { entry -> entry != Section.Settings }.forEach { entry ->
-            SideMenuItem(section = entry, isSelected = entry == selected, onClick = { onSelect(entry) })
+        TopLevelDestination.entries.forEach { destination ->
+            val entry = MenuEntry.Tab(destination)
+            SideMenuItem(
+                label = destination.label,
+                icon = destination.icon,
+                selectedIcon = destination.selectedIcon,
+                isSelected = selected == entry,
+                onClick = { onSelect(entry) },
+            )
         }
         Spacer(Modifier.weight(1f))
-        SideMenuItem(section = Section.Settings, isSelected = selected == Section.Settings, onClick = { onSelect(Section.Settings) })
+        SideMenuItem(
+            label = Res.string.profile_downloads,
+            icon = Res.drawable.ic_download,
+            selectedIcon = Res.drawable.ic_download,
+            isSelected = selected == MenuEntry.Downloads,
+            onClick = { onSelect(MenuEntry.Downloads) },
+        )
+        SideMenuItem(
+            label = Res.string.tab_settings,
+            icon = Res.drawable.ic_settings,
+            selectedIcon = Res.drawable.ic_settings,
+            isSelected = selected == MenuEntry.Settings,
+            onClick = { onSelect(MenuEntry.Settings) },
+        )
         Spacer(Modifier.height(FlixTheme.spacing.md))
     }
 }
@@ -228,7 +300,13 @@ private fun Wordmark(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun SideMenuItem(section: Section, isSelected: Boolean, onClick: () -> Unit) {
+private fun SideMenuItem(
+    label: StringResource,
+    icon: DrawableResource,
+    selectedIcon: DrawableResource,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+) {
     val colors = FlixTheme.colors
     Row(
         modifier = Modifier
@@ -236,18 +314,19 @@ private fun SideMenuItem(section: Section, isSelected: Boolean, onClick: () -> U
             .height(SIDE_MENU_ITEM_HEIGHT)
             .clip(FlixTheme.shapes.md)
             .background(if (isSelected) colors.surfaceVariant else colors.surface)
-            .handCursor().selectable(selected = isSelected, onClick = onClick, role = Role.Tab)
+            .handCursor()
+            .selectable(selected = isSelected, onClick = onClick, role = Role.Tab)
             .padding(horizontal = FlixTheme.spacing.md),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(FlixTheme.spacing.md),
     ) {
         Icon(
-            painter = painterResource(if (isSelected) section.selectedIcon else section.icon),
+            painter = painterResource(if (isSelected) selectedIcon else icon),
             contentDescription = null,
             tint = if (isSelected) colors.textPrimary else colors.textSecondary,
         )
         Text(
-            text = stringResource(section.label),
+            text = stringResource(label),
             style = FlixTheme.typography.label,
             color = if (isSelected) colors.textPrimary else colors.textSecondary,
         )
@@ -256,5 +335,5 @@ private fun SideMenuItem(section: Section, isSelected: Boolean, onClick: () -> U
 
 private val SIDE_MENU_WIDTH = 232.dp
 private val WORDMARK_AREA_HEIGHT = 88.dp
-private const val DEFAULT_VOLUME = 100
 private val SIDE_MENU_ITEM_HEIGHT = 44.dp
+private const val DEFAULT_VOLUME = 100

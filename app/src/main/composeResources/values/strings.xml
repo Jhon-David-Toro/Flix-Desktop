@@ -364,5 +364,6 @@
     <string name="settings_start_with_windows_body">Se abre minimizado al encender el equipo</string>
     <string name="settings_start_with_windows_unavailable">Disponible en la versión instalada</string>
     <string name="tab_settings">Ajustes</string>
+    <string name="share_copied">Copiado al portapapeles</string>
     <string name="lyrics_title">Letra</string>
 </resources>

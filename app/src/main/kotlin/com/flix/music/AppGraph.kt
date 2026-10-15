@@ -10,6 +10,10 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.flix.music.core.data.database.FlixDatabase
 import com.flix.music.core.data.lyrics.LrclibClient
 import com.flix.music.core.data.lyrics.SavedLyricsStore
+import com.flix.music.core.data.repository.CacheRepository
+import com.flix.music.core.data.repository.CacheRepositoryImpl
+import com.flix.music.core.data.repository.DesktopDownloadsRepository
+import com.flix.music.core.data.repository.DownloadsRepository
 import com.flix.music.core.data.repository.FavoritesRepository
 import com.flix.music.core.data.repository.FavoritesRepositoryImpl
 import com.flix.music.core.data.repository.FollowedArtistsRepository
@@ -38,14 +42,29 @@ import com.flix.music.core.player.mpv.MpvEngine
 import com.flix.music.core.player.stream.AudioServer
 import com.flix.music.core.player.stream.NewPipeStreamResolver
 import com.flix.music.core.system.WindowsAutostart
+import com.flix.music.feature.album.AlbumViewModel
+import com.flix.music.feature.artist.ArtistViewModel
+import com.flix.music.feature.downloads.DownloadsViewModel
+import com.flix.music.feature.favorites.FavoritesViewModel
+import com.flix.music.feature.genre.GenreViewModel
+import com.flix.music.feature.history.HistoryViewModel
+import com.flix.music.feature.home.HomeViewModel
+import com.flix.music.feature.library.LibraryViewModel
 import com.flix.music.feature.player.LyricsViewModel
 import com.flix.music.feature.player.NowPlayingViewModel
+import com.flix.music.feature.playlist.PlaylistEditViewModel
+import com.flix.music.feature.playlist.PlaylistViewModel
+import com.flix.music.feature.profile.ProfileViewModel
+import com.flix.music.feature.profile.StatsViewModel
 import com.flix.music.feature.search.SearchViewModel
 import com.flix.music.feature.settings.SettingsViewModel
+import com.flix.music.feature.song.SongViewModel
+import com.flix.music.feature.trackmenu.TrackMenuViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import java.io.File
@@ -70,49 +89,55 @@ class AppGraph(val dataDirectory: File = defaultDataDirectory()) {
 
     private val clock: Clock = Clock.systemDefaultZone()
 
+    /** Artwork and other caches, emptied from Ajustes. */
+    val cacheDirectory = File(dataDirectory, "cache").apply { mkdirs() }
+
     private val preferences: DataStore<Preferences> = PreferenceDataStoreFactory.create(
         produceFile = { File(dataDirectory, "flix_preferences.preferences_pb") },
     )
-
-    val newPipeSetup = NewPipeSetup(okHttpClient)
-
-    private val streamResolver = NewPipeStreamResolver(newPipeSetup, clock)
-
-    private val audioServer = AudioServer(okHttpClient, streamResolver)
-
-    val player = DesktopPlayerController(
-        engineFactory = { onSignal -> MpvEngine(libmpvFile(), onSignal) },
-        urlOf = audioServer::urlOf,
-        streamResolver = streamResolver,
-        scope = applicationScope,
-    )
-
-    val musicRepository: MusicRepository = MusicRepositoryImpl(YouTubeMusicClient(okHttpClient, json, clock), newPipeSetup)
-
-    val recentSearchesRepository: RecentSearchesRepository = RecentSearchesRepositoryImpl(preferences, json)
-
-    val settingsRepository: SettingsRepository = SettingsRepositoryImpl(preferences)
 
     private val database: FlixDatabase = Room.databaseBuilder<FlixDatabase>(name = File(dataDirectory, "flix.db").absolutePath)
         .setDriver(BundledSQLiteDriver())
         .setQueryCoroutineContext(Dispatchers.IO)
         .build()
 
+    val newPipeSetup = NewPipeSetup(okHttpClient)
+
+    private val streamResolver = NewPipeStreamResolver(newPipeSetup, clock)
+
+    val musicRepository: MusicRepository = MusicRepositoryImpl(YouTubeMusicClient(okHttpClient, json, clock), newPipeSetup)
+    val recentSearchesRepository: RecentSearchesRepository = RecentSearchesRepositoryImpl(preferences, json)
+    val settingsRepository: SettingsRepository = SettingsRepositoryImpl(preferences)
     val favoritesRepository: FavoritesRepository = FavoritesRepositoryImpl(database.favoritesDao())
-
     val historyRepository: HistoryRepository = HistoryRepositoryImpl(database.historyDao())
-
     val playlistsRepository: PlaylistsRepository = PlaylistsRepositoryImpl(database.playlistsDao(), clock)
-
     val followedArtistsRepository: FollowedArtistsRepository = FollowedArtistsRepositoryImpl(database.followedArtistsDao(), clock)
-
     val savedAlbumsRepository: SavedAlbumsRepository = SavedAlbumsRepositoryImpl(database.savedAlbumsDao(), clock)
-
     val libraryLayoutRepository: LibraryLayoutRepository = LibraryLayoutRepositoryImpl(preferences)
+    val cacheRepository: CacheRepository = CacheRepositoryImpl(cacheDirectory)
 
     private val savedLyricsStore = SavedLyricsStore(File(dataDirectory, "lyrics"), json)
-
     val lyricsRepository: LyricsRepository = LyricsRepositoryImpl(LrclibClient(okHttpClient, json), savedLyricsStore)
+
+    private val desktopDownloads = DesktopDownloadsRepository(
+        directory = File(dataDirectory, "downloads"),
+        okHttpClient = okHttpClient,
+        streamResolver = streamResolver,
+        lyricsRepository = lyricsRepository,
+        savedLyricsStore = savedLyricsStore,
+        json = json,
+    )
+    val downloadsRepository: DownloadsRepository = desktopDownloads
+
+    private val audioServer = AudioServer(okHttpClient, streamResolver, desktopDownloads::downloadedFile)
+
+    val player = DesktopPlayerController(
+        engineFactory = { onSignal -> MpvEngine(libmpvFile(), onSignal) },
+        urlOf = audioServer::urlOf,
+        streamResolver = streamResolver,
+        scope = applicationScope,
+        onFirstPlay = { track -> applicationScope.launch { runCatching { historyRepository.record(track) } } },
+    )
 
     private val autostart = WindowsAutostart()
 
@@ -128,18 +153,36 @@ class AppGraph(val dataDirectory: File = defaultDataDirectory()) {
     }
 
     /** Builds the screen ViewModels, as Hilt does on the phone; [savedStateHandle] carries navigation arguments. */
-    @Suppress("UNCHECKED_CAST", "UNUSED_PARAMETER")
+    @Suppress("UNCHECKED_CAST")
     fun <Model : ViewModel> viewModel(type: KClass<Model>, savedStateHandle: SavedStateHandle): Model = when (type) {
+        HomeViewModel::class -> HomeViewModel(historyRepository, favoritesRepository, playlistsRepository, musicRepository, player, clock)
         SearchViewModel::class -> SearchViewModel(musicRepository, recentSearchesRepository, player)
-        SettingsViewModel::class -> SettingsViewModel(settingsRepository, autostart, VERSION)
+        GenreViewModel::class -> GenreViewModel(savedStateHandle, musicRepository, player)
+        LibraryViewModel::class -> LibraryViewModel(
+            favoritesRepository, historyRepository, playlistsRepository, savedAlbumsRepository,
+            followedArtistsRepository, libraryLayoutRepository, player, clock,
+        )
+        FavoritesViewModel::class -> FavoritesViewModel(favoritesRepository, player)
+        HistoryViewModel::class -> HistoryViewModel(historyRepository, player, clock)
+        PlaylistViewModel::class -> PlaylistViewModel(savedStateHandle, playlistsRepository, player, downloadsRepository)
+        PlaylistEditViewModel::class -> PlaylistEditViewModel(savedStateHandle, playlistsRepository)
+        AlbumViewModel::class -> AlbumViewModel(savedStateHandle, musicRepository, savedAlbumsRepository, player)
+        ArtistViewModel::class -> ArtistViewModel(savedStateHandle, musicRepository, followedArtistsRepository, player)
+        SongViewModel::class -> SongViewModel(savedStateHandle, musicRepository, favoritesRepository, followedArtistsRepository, player)
+        ProfileViewModel::class -> ProfileViewModel(historyRepository, playlistsRepository, favoritesRepository, followedArtistsRepository, clock)
+        StatsViewModel::class -> StatsViewModel(historyRepository, clock)
+        DownloadsViewModel::class -> DownloadsViewModel(downloadsRepository, player)
+        TrackMenuViewModel::class -> TrackMenuViewModel(favoritesRepository, playlistsRepository, player, downloadsRepository)
         LyricsViewModel::class -> LyricsViewModel(lyricsRepository, player)
         NowPlayingViewModel::class -> NowPlayingViewModel(player, favoritesRepository)
+        SettingsViewModel::class -> SettingsViewModel(settingsRepository, autostart, VERSION)
         else -> error("No ViewModel factory for ${type.simpleName}")
     } as Model
 
     fun close() {
         player.release()
         audioServer.stop()
+        database.close()
     }
 
     companion object {

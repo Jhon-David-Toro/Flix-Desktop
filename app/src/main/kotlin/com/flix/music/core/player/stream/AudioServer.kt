@@ -5,7 +5,9 @@ import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.io.File
 import java.io.IOException
+import java.io.RandomAccessFile
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.util.concurrent.Executors
@@ -16,11 +18,13 @@ import java.util.concurrent.Executors
  * with [streamResolver] and relays googlevideo's audio, forwarding the player's
  * `Range` so seeking works, and asking for `bytes=0-` when the player sends none,
  * since googlevideo throttles requests without a Range. A URL googlevideo rejects is
- * resolved again once.
+ * resolved again once. Downloaded songs ([downloadedFile]) are served from disk instead,
+ * so they play offline and seek the same way.
  */
 class AudioServer(
     private val okHttpClient: OkHttpClient,
     private val streamResolver: StreamResolver,
+    private val downloadedFile: (trackId: String) -> File? = { null },
 ) {
 
     private val server: HttpServer = HttpServer.create(InetSocketAddress(InetAddress.getLoopbackAddress(), 0), 0).apply {
@@ -39,6 +43,8 @@ class AudioServer(
         if (!TRACK_ID.matches(trackId)) return exchange.sendResponseHeaders(NOT_FOUND, NO_BODY)
         val playerRange = exchange.requestHeaders.getFirst(RANGE_HEADER)
         try {
+            val file = downloadedFile(trackId)
+            if (file != null) return serveFile(exchange, file, playerRange)
             relay(exchange, trackId, playerRange, retryOnRejection = true)
         } catch (exception: IOException) {
             Log.w(TAG, "Could not serve $trackId: ${exception.message}")
@@ -71,7 +77,38 @@ class AudioServer(
         }
     }
 
-    /** The whole file's size, which JavaFX reads from HEAD to know it can seek. */
+    /** A downloaded song, honoring the player's Range (`bytes=start-` or `bytes=start-end`). */
+    private fun serveFile(exchange: HttpExchange, file: File, playerRange: String?) {
+        val length = file.length()
+        val range = playerRange?.let(RANGE::find)
+        val start = range?.groupValues?.get(1)?.toLongOrNull()?.coerceIn(0, length) ?: 0L
+        val end = range?.groupValues?.get(2)?.toLongOrNull()?.coerceIn(start, length - 1) ?: (length - 1)
+        val count = (end - start + 1).coerceAtLeast(0)
+        exchange.responseHeaders.set(CONTENT_TYPE, AUDIO_MP4)
+        exchange.responseHeaders.set("Accept-Ranges", "bytes")
+        if (range != null) exchange.responseHeaders.set(CONTENT_RANGE, "bytes $start-$end/$length")
+        val status = if (range != null) PARTIAL_CONTENT else OK
+        if (exchange.requestMethod == HEAD) {
+            exchange.responseHeaders.set(CONTENT_LENGTH, length.toString())
+            return exchange.sendResponseHeaders(status, NO_BODY)
+        }
+        exchange.sendResponseHeaders(status, count)
+        RandomAccessFile(file, "r").use { input ->
+            input.seek(start)
+            exchange.responseBody.use { output ->
+                val buffer = ByteArray(COPY_BUFFER_BYTES)
+                var remaining = count
+                while (remaining > 0) {
+                    val read = input.read(buffer, 0, minOf(buffer.size.toLong(), remaining).toInt())
+                    if (read < 0) break
+                    output.write(buffer, 0, read)
+                    remaining -= read
+                }
+            }
+        }
+    }
+
+    /** The whole file's size, which players read from HEAD to know they can seek. */
     private fun totalLengthOf(response: okhttp3.Response): Long? =
         response.header(CONTENT_RANGE)?.substringAfterLast('/')?.toLongOrNull()
             ?: response.body.contentLength().takeIf { length -> length >= 0 }
@@ -87,6 +124,10 @@ class AudioServer(
         const val CONTENT_RANGE = "Content-Range"
         const val CONTENT_LENGTH = "Content-Length"
         const val OK = 200
+        const val PARTIAL_CONTENT = 206
+        const val AUDIO_MP4 = "audio/mp4"
+        const val COPY_BUFFER_BYTES = 64 * 1024
+        val RANGE = Regex("""^bytes=(\d+)-(\d*)$""")
         const val FORBIDDEN = 403
         const val NOT_FOUND = 404
         const val BAD_GATEWAY = 502

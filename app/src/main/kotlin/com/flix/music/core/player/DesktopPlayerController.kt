@@ -21,8 +21,9 @@ import kotlin.time.Duration.Companion.seconds
  * time plays on an [AudioEngine] (mpv), read from [urlOf] (the local audio server).
  * Works like the phone's: the next songs are resolved ahead, a failed song is retried
  * once with a freshly resolved URL and then skipped with [PlayerEvent.TrackSkipped],
- * and the last one stays in [PlaybackStatus.Error] with a retry action. Everything runs
- * on [scope]'s thread; engine signals are handed over to it.
+ * and the last one stays in [PlaybackStatus.Error] with a retry action. [onFirstPlay]
+ * runs once per song when it really starts playing (the history). Everything runs on
+ * [scope]'s thread; engine signals are handed over to it.
  */
 class DesktopPlayerController(
     engineFactory: ((AudioSignal) -> Unit) -> AudioEngine,
@@ -31,6 +32,7 @@ class DesktopPlayerController(
     private val scope: CoroutineScope,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val queue: PlayQueue = PlayQueue(),
+    private val onFirstPlay: (Track) -> Unit = {},
 ) : PlayerController {
 
     private val engine: AudioEngine = engineFactory { signal -> scope.launch { onSignal(signal) } }
@@ -51,6 +53,7 @@ class DesktopPlayerController(
     private var failed = false
     private var retriedCurrent = false
     private var publishedPosition: Duration = Duration.ZERO
+    private var recordedCurrent = false
 
     override fun play(tracks: List<Track>, startIndex: Int, source: PlaybackSource, shuffle: Boolean) {
         if (tracks.isEmpty()) return
@@ -162,6 +165,7 @@ class DesktopPlayerController(
 
     private fun startCurrent(from: Duration = Duration.ZERO) {
         val current = queue.current ?: return
+        if (from == Duration.ZERO) recordedCurrent = false
         position = from
         publishedPosition = from
         duration = current.duration
@@ -238,7 +242,7 @@ class DesktopPlayerController(
     private fun publish() {
         val current = queue.current
         publishedPosition = position
-        _state.value = PlayerState(
+        val newState = PlayerState(
             status = when {
                 current == null -> PlaybackStatus.Idle
                 failed -> PlaybackStatus.Error
@@ -260,6 +264,11 @@ class DesktopPlayerController(
             hasPrevious = queue.hasPrevious,
             hasNext = queue.hasNext,
         )
+        _state.value = newState
+        if (current != null && newState.status == PlaybackStatus.Playing && !recordedCurrent) {
+            recordedCurrent = true
+            onFirstPlay(current)
+        }
     }
 
     private companion object {
