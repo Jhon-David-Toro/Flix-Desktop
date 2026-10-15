@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -236,6 +237,7 @@ private fun SongHeader(uiState: SongUiState, track: Track, actions: SongActions)
             modifier = Modifier
                 .padding(horizontal = FlixTheme.spacing.xxl)
                 .padding(top = FlixTheme.spacing.xs)
+                .widthIn(max = COVER_MAX_SIZE)
                 .fillMaxWidth()
                 .aspectRatio(1f)
                 .shadow(8.dp, COVER_SHAPE)
@@ -364,6 +366,7 @@ private fun SongSkeleton() {
             Modifier
                 .padding(horizontal = FlixTheme.spacing.xxl)
                 .padding(top = FlixTheme.spacing.xs)
+                .widthIn(max = COVER_MAX_SIZE)
                 .fillMaxWidth()
                 .aspectRatio(1f),
         )
@@ -385,3 +388,5 @@ private fun SongSkeleton() {
 private val COVER_SHAPE = RoundedCornerShape(16.dp)
 private val SECTION_TOP = 22.dp
 
+/** On the desktop the phone's full-width cover would fill the window: it stops at a cover's size. */
+private val COVER_MAX_SIZE = 300.dp
