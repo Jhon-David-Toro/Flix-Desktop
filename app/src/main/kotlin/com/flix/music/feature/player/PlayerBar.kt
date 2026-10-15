@@ -2,9 +2,7 @@ package com.flix.music.feature.player
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,20 +10,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -54,7 +45,6 @@ import com.flix.music.resources.player_volume
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import kotlin.math.roundToInt
 import kotlin.time.Duration
 
 /** Every action of the player bar. Defaults do nothing, which keeps snapshots short. */
@@ -192,7 +182,7 @@ fun PlayerBar(state: PlayerState, volume: Int, actions: PlayerBarActions, modifi
                 tint = colors.textSecondary,
                 modifier = Modifier.size(ICON_SIZE),
             )
-            VolumeSlider(
+            VolumeBar(
                 volume = volume,
                 onVolumeChange = actions.onVolumeChange,
                 contentDescription = stringResource(Res.string.player_volume),
@@ -202,42 +192,6 @@ fun PlayerBar(state: PlayerState, volume: Int, actions: PlayerBarActions, modifi
             )
         }
     }
-}
-
-/** A thin volume bar in the seek bar's style: textPrimary fill on surfaceVariant, a small round thumb. */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun VolumeSlider(volume: Int, onVolumeChange: (Int) -> Unit, contentDescription: String, modifier: Modifier = Modifier) {
-    val colors = FlixTheme.colors
-    val sliderColors = SliderDefaults.colors(
-        thumbColor = colors.textPrimary,
-        activeTrackColor = colors.textPrimary,
-        inactiveTrackColor = colors.surfaceVariant,
-    )
-    val interactionSource = remember { MutableInteractionSource() }
-    Slider(
-        value = volume.toFloat(),
-        onValueChange = { value -> onVolumeChange(value.roundToInt()) },
-        valueRange = 0f..MAX_VOLUME,
-        interactionSource = interactionSource,
-        modifier = modifier.semantics { this.contentDescription = contentDescription },
-        thumb = {
-            Box(
-                Modifier
-                    .size(VOLUME_THUMB_SIZE)
-                    .background(colors.textPrimary, CircleShape),
-            )
-        },
-        track = { sliderState ->
-            SliderDefaults.Track(
-                sliderState = sliderState,
-                colors = sliderColors,
-                thumbTrackGapSize = 0.dp,
-                drawStopIndicator = null,
-                modifier = Modifier.height(VOLUME_TRACK_HEIGHT),
-            )
-        },
-    )
 }
 
 @Composable
@@ -285,8 +239,6 @@ private val PLAY_ICON_SIZE = 24.dp
 private val ICON_SIZE = 20.dp
 private val TIME_WIDTH = 44.dp
 private val VOLUME_WIDTH = 120.dp
-private val VOLUME_THUMB_SIZE = 12.dp
-private val VOLUME_TRACK_HEIGHT = 4.dp
 private const val SIDE_WEIGHT = 1f
 private const val CENTER_WEIGHT = 1.4f
 private const val MAX_VOLUME = 100f

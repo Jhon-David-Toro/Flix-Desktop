@@ -4,8 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.flix.music.core.designsystem.component.NowPlayingMarker
 import com.flix.music.core.designsystem.theme.FlixTheme
 import com.flix.music.core.designsystem.theme.ThemeMode
@@ -24,6 +26,7 @@ import com.flix.music.feature.player.LyricsUiState
 import com.flix.music.feature.player.NowPlayingContent
 import com.flix.music.feature.player.PlayerBar
 import com.flix.music.feature.player.PlayerBarActions
+import com.flix.music.feature.player.VolumeBar
 import com.flix.music.feature.search.SearchActions
 import com.flix.music.feature.search.SearchContent
 import com.flix.music.feature.search.SearchFilter
@@ -135,6 +138,15 @@ class ScreensSnapshotTest {
                 )
             }
             PlayerBar(state = playerState.copy(position = 98.seconds), volume = 70, actions = PlayerBarActions())
+        }
+    }
+
+    @Test
+    fun `volumen al mínimo, a la mitad y al máximo`() = snapshot("volume", width = 200, height = 90) {
+        Column(Modifier.fillMaxSize().background(FlixTheme.colors.surfaceElevated)) {
+            listOf(0, 50, 100).forEach { level ->
+                VolumeBar(volume = level, onVolumeChange = {}, contentDescription = "Volumen", modifier = Modifier.width(160.dp))
+            }
         }
     }
 }
