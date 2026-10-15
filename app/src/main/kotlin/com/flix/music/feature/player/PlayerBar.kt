@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
@@ -30,8 +29,10 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.flix.music.core.designsystem.component.IconButton
 import com.flix.music.core.designsystem.component.PlayPauseButton
 import com.flix.music.core.designsystem.component.SeekBar
+import com.flix.music.core.designsystem.component.handCursor
 import com.flix.music.core.designsystem.component.util.toClock
 import com.flix.music.core.designsystem.theme.FlixTheme
 import com.flix.music.core.player.PlaybackStatus
@@ -89,7 +90,7 @@ fun PlayerBar(state: PlayerState, volume: Int, actions: PlayerBarActions, modifi
             modifier = Modifier
                 .weight(SIDE_WEIGHT)
                 .clip(FlixTheme.shapes.md)
-                .clickable(onClick = actions.onOpenPlayer)
+                .handCursor().clickable(onClick = actions.onOpenPlayer)
                 .padding(FlixTheme.spacing.xs),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(FlixTheme.spacing.md),

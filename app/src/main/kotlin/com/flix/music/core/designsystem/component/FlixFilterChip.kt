@@ -1,6 +1,5 @@
 package com.flix.music.core.designsystem.component
 
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable

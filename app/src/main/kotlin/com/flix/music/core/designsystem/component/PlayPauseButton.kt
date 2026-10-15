@@ -58,7 +58,7 @@ fun PlayPauseButton(
                 .matchParentSize()
                 .clip(FlixTheme.shapes.circle)
                 .background(FlixTheme.colors.primary)
-                .clickable(enabled = enabled, role = Role.Button, onClick = onClick),
+                .handCursor().clickable(enabled = enabled, role = Role.Button, onClick = onClick),
             contentAlignment = Alignment.Center,
         ) {
             AnimatedIcon(icon = icon, tint = FlixTheme.colors.onPrimary, iconSize = iconSize)

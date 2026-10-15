@@ -43,7 +43,7 @@ fun FlixCard(
             .then(elevationModifier)
             .clip(shape)
             .background(surfaceColor)
-            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+            .then(if (onClick != null) Modifier.handCursor().clickable(onClick = onClick) else Modifier)
             .drawWithContent {
                 drawContent()
                 if (isDark) {

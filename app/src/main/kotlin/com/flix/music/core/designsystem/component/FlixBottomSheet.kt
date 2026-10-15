@@ -144,7 +144,7 @@ fun RowScope.SheetQuickAction(
             .weight(1f)
             .clip(FlixTheme.shapes.md)
             .background(FlixTheme.colors.surfaceVariant)
-            .clickable(role = Role.Button, onClick = onClick)
+            .handCursor().clickable(role = Role.Button, onClick = onClick)
             .padding(horizontal = FlixTheme.spacing.xs, vertical = 10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(6.dp),
@@ -186,7 +186,7 @@ fun SheetRowLayout(
         modifier = modifier
             .fillMaxWidth()
             .height(height)
-            .clickable(role = Role.Button, onClick = onClick)
+            .handCursor().clickable(role = Role.Button, onClick = onClick)
             .padding(horizontal = FlixTheme.spacing.xl),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),

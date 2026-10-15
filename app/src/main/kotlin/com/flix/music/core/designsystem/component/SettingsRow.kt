@@ -42,7 +42,7 @@ fun SettingsRow(
             .fillMaxWidth()
             .heightIn(min = 50.dp)
             .alpha(if (enabled) 1f else DISABLED_ALPHA)
-            .then(if (onClick != null && enabled) Modifier.clickable(onClick = onClick) else Modifier)
+            .then(if (onClick != null && enabled) Modifier.handCursor().clickable(onClick = onClick) else Modifier)
             .padding(horizontal = FlixTheme.spacing.gutter),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(FlixTheme.spacing.md),

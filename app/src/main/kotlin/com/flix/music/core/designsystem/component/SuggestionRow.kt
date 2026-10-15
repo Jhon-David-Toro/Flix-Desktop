@@ -34,7 +34,7 @@ fun SuggestionRow(
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = SUGGESTION_ROW_MIN_HEIGHT)
-            .clickable(onClick = onClick)
+            .handCursor().clickable(onClick = onClick)
             .padding(
                 start = FlixTheme.spacing.gutter,
                 end = if (trailing != null) FlixTheme.spacing.xs else FlixTheme.spacing.gutter,

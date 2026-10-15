@@ -56,7 +56,7 @@ fun <Value> FlixSegmentedControl(
                     .then(if (isSelected) Modifier.shadow(1.dp, SEGMENT_SHAPE) else Modifier)
                     .clip(SEGMENT_SHAPE)
                     .background(if (isSelected) FlixTheme.colors.surface else Color.Transparent)
-                    .selectable(selected = isSelected, role = Role.Tab, onClick = { onSelect(segment.value) })
+                    .handCursor().selectable(selected = isSelected, role = Role.Tab, onClick = { onSelect(segment.value) })
                     .padding(vertical = 7.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),

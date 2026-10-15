@@ -57,7 +57,7 @@ fun GenreTile(
                     )
                 }
             }
-            .clickable(onClick = onClick)
+            .handCursor().clickable(onClick = onClick)
             .padding(horizontal = FlixTheme.spacing.lg, vertical = FlixTheme.spacing.md),
     ) {
         Text(

@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.flix.music.core.designsystem.component.FlixSnackbar
 import com.flix.music.core.designsystem.component.LocalSnackbarHostState
+import com.flix.music.core.designsystem.component.handCursor
 import com.flix.music.core.designsystem.theme.FlixTheme
 import com.flix.music.core.ui.LocalAppGraph
 import com.flix.music.feature.player.PlayerBar
@@ -165,7 +166,7 @@ private fun SideMenuItem(section: Section, isSelected: Boolean, onClick: () -> U
             .height(SIDE_MENU_ITEM_HEIGHT)
             .clip(FlixTheme.shapes.md)
             .background(if (isSelected) colors.surfaceVariant else colors.surface)
-            .selectable(selected = isSelected, onClick = onClick, role = Role.Tab)
+            .handCursor().selectable(selected = isSelected, onClick = onClick, role = Role.Tab)
             .padding(horizontal = FlixTheme.spacing.md),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(FlixTheme.spacing.md),

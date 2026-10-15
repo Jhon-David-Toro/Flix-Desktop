@@ -33,7 +33,7 @@ fun MediaCard(
     Column(
         modifier = modifier
             .clip(FlixTheme.shapes.md)
-            .clickable(onClick = onClick),
+            .handCursor().clickable(onClick = onClick),
         horizontalAlignment = if (circular) Alignment.CenterHorizontally else Alignment.Start,
     ) {
         AsyncImage(

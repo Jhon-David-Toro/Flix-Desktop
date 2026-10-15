@@ -19,7 +19,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -42,6 +41,7 @@ import com.flix.music.core.designsystem.component.FlixChip
 import com.flix.music.core.designsystem.component.FlixFilterChip
 import com.flix.music.core.designsystem.component.GENRE_TILE_COMPACT_HEIGHT
 import com.flix.music.core.designsystem.component.GenreTile
+import com.flix.music.core.designsystem.component.IconButton
 import com.flix.music.core.designsystem.component.LoadingHairline
 import com.flix.music.core.designsystem.component.MediaCard
 import com.flix.music.core.designsystem.component.NowPlayingMarker
