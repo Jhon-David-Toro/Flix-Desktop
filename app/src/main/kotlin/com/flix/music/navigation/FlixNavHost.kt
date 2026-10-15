@@ -112,8 +112,15 @@ fun NavController.openInLibrary(route: Any) {
  * Switches tabs keeping one back stack per tab: the tab being left is saved and
  * the target tab restores its own stack.
  */
-fun NavController.navigateToTopLevel(destination: TopLevelDestination) {
-    navigate(destination.route) {
+fun NavController.navigateToTopLevel(destination: TopLevelDestination) = navigateToMenuRoute(destination.route)
+
+/**
+ * Opens one of the side menu's destinations (a tab, Descargas or Ajustes) as its own
+ * stack: the one being left is saved and the target's is restored, so a screen opened
+ * in one never shows up inside another.
+ */
+fun NavController.navigateToMenuRoute(route: Any) {
+    navigate(route) {
         popUpTo(graph.findStartDestination().id) {
             saveState = true
         }
