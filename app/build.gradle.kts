@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 kotlin {
@@ -26,6 +28,9 @@ dependencies {
     implementation(libs.jna)
     implementation(libs.datastore.preferences.core)
     implementation(libs.navigation.compose)
+    implementation(libs.room.runtime)
+    implementation(libs.sqlite.bundled)
+    ksp(libs.room.compiler)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
@@ -34,6 +39,10 @@ dependencies {
 tasks.test {
     systemProperty("flix.liveTests", providers.gradleProperty("liveTests").getOrElse("false"))
     systemProperty("compose.application.resources.dir", layout.projectDirectory.dir("resources/windows").asFile.absolutePath)
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 compose.resources {

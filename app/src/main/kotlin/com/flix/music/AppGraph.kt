@@ -5,10 +5,25 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.room.Room
+import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import com.flix.music.core.data.database.FlixDatabase
+import com.flix.music.core.data.repository.FavoritesRepository
+import com.flix.music.core.data.repository.FavoritesRepositoryImpl
+import com.flix.music.core.data.repository.FollowedArtistsRepository
+import com.flix.music.core.data.repository.FollowedArtistsRepositoryImpl
+import com.flix.music.core.data.repository.HistoryRepository
+import com.flix.music.core.data.repository.HistoryRepositoryImpl
+import com.flix.music.core.data.repository.LibraryLayoutRepository
+import com.flix.music.core.data.repository.LibraryLayoutRepositoryImpl
 import com.flix.music.core.data.repository.MusicRepository
 import com.flix.music.core.data.repository.MusicRepositoryImpl
+import com.flix.music.core.data.repository.PlaylistsRepository
+import com.flix.music.core.data.repository.PlaylistsRepositoryImpl
 import com.flix.music.core.data.repository.RecentSearchesRepository
 import com.flix.music.core.data.repository.RecentSearchesRepositoryImpl
+import com.flix.music.core.data.repository.SavedAlbumsRepository
+import com.flix.music.core.data.repository.SavedAlbumsRepositoryImpl
 import com.flix.music.core.data.repository.SettingsRepository
 import com.flix.music.core.data.repository.SettingsRepositoryImpl
 import com.flix.music.core.data.youtube.NewPipeSetup
@@ -71,6 +86,23 @@ class AppGraph(val dataDirectory: File = defaultDataDirectory()) {
     val recentSearchesRepository: RecentSearchesRepository = RecentSearchesRepositoryImpl(preferences, json)
 
     val settingsRepository: SettingsRepository = SettingsRepositoryImpl(preferences)
+
+    private val database: FlixDatabase = Room.databaseBuilder<FlixDatabase>(name = File(dataDirectory, "flix.db").absolutePath)
+        .setDriver(BundledSQLiteDriver())
+        .setQueryCoroutineContext(Dispatchers.IO)
+        .build()
+
+    val favoritesRepository: FavoritesRepository = FavoritesRepositoryImpl(database.favoritesDao())
+
+    val historyRepository: HistoryRepository = HistoryRepositoryImpl(database.historyDao())
+
+    val playlistsRepository: PlaylistsRepository = PlaylistsRepositoryImpl(database.playlistsDao(), clock)
+
+    val followedArtistsRepository: FollowedArtistsRepository = FollowedArtistsRepositoryImpl(database.followedArtistsDao(), clock)
+
+    val savedAlbumsRepository: SavedAlbumsRepository = SavedAlbumsRepositoryImpl(database.savedAlbumsDao(), clock)
+
+    val libraryLayoutRepository: LibraryLayoutRepository = LibraryLayoutRepositoryImpl(preferences)
 
     private val autostart = WindowsAutostart()
 
