@@ -23,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -93,7 +92,7 @@ private sealed interface MenuEntry {
  * opens over them, and the player lives in a bar along the bottom.
  */
 @Composable
-fun FlixDesktopApp() {
+fun FlixDesktopApp(volume: Int, onVolumeChange: (Int) -> Unit) {
     val graph = LocalAppGraph.current
     val player = graph.player
     val playerState by player.state.collectAsStateWithLifecycle()
@@ -102,7 +101,6 @@ fun FlixDesktopApp() {
     var lastTab by rememberSaveable { mutableStateOf(TopLevelDestination.Home) }
     val selected = currentEntry?.let(::menuEntryOf) ?: MenuEntry.Tab(lastTab)
     SideEffect { (selected as? MenuEntry.Tab)?.let { tab -> lastTab = tab.destination } }
-    var volume by rememberSaveable { mutableIntStateOf(DEFAULT_VOLUME) }
     var nowPlayingOpen by rememberSaveable { mutableStateOf(false) }
     if (playerState.current == null) nowPlayingOpen = false
     val snackbarHostState = remember { SnackbarHostState() }
@@ -128,7 +126,7 @@ fun FlixDesktopApp() {
     val errorShortcuts = remember(navController) {
         ErrorShortcuts(openLibrary = { navController.navigateToTopLevel(TopLevelDestination.Library) })
     }
-    val playerActions = remember(player) {
+    val playerActions = remember(player, onVolumeChange) {
         PlayerBarActions(
             onPlayPause = player::togglePlayPause,
             onPrevious = player::skipToPrevious,
@@ -136,10 +134,7 @@ fun FlixDesktopApp() {
             onSeek = player::seekTo,
             onToggleShuffle = player::toggleShuffle,
             onCycleRepeat = player::cycleRepeatMode,
-            onVolumeChange = { percent ->
-                volume = percent
-                player.setVolume(percent)
-            },
+            onVolumeChange = onVolumeChange,
             onOpenPlayer = { nowPlayingOpen = !nowPlayingOpen },
         )
     }
@@ -336,4 +331,3 @@ private fun SideMenuItem(
 private val SIDE_MENU_WIDTH = 232.dp
 private val WORDMARK_AREA_HEIGHT = 88.dp
 private val SIDE_MENU_ITEM_HEIGHT = 44.dp
-private const val DEFAULT_VOLUME = 100

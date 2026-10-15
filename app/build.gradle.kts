@@ -26,6 +26,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.jna)
+    implementation(libs.jna.platform)
     implementation(libs.datastore.preferences.core)
     implementation(libs.navigation.compose)
     implementation(libs.room.runtime)

@@ -144,6 +144,12 @@ class DesktopPlayerController(
 
     fun queuedTrackIds(): Set<String> = queue.trackIds
 
+    /** Shuffle and repeat as they were last time ("Recordar aleatorio y repetir"). */
+    fun restoreModes(shuffle: Boolean, repeatMode: RepeatMode) = changeQueue {
+        queue.repeatMode = repeatMode
+        queue.setShuffle(shuffle)
+    }
+
     fun setVolume(percent: Int) = engine.setVolume(percent)
 
     fun release() = engine.close()

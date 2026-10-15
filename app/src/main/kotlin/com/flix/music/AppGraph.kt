@@ -191,7 +191,8 @@ class AppGraph(val dataDirectory: File = defaultDataDirectory()) {
         private const val CONNECT_TIMEOUT_SECONDS = 10L
         private const val READ_TIMEOUT_SECONDS = 30L
 
-        private fun defaultDataDirectory(): File {
+        /** `%APPDATA%\Flix` on Windows, `~/.flix` elsewhere. */
+        fun defaultDataDirectory(): File {
             val appData = System.getenv("APPDATA")
             val directory = if (appData != null) File(appData, "Flix") else File(System.getProperty("user.home"), ".flix")
             return directory.apply { mkdirs() }
