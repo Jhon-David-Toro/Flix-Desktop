@@ -2,6 +2,8 @@ package com.flix.music
 
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -10,6 +12,8 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.flix.music.core.designsystem.theme.FlixTheme
 import com.flix.music.core.designsystem.theme.ThemeMode
+import com.flix.music.core.model.AppTheme
+import com.flix.music.core.system.WindowsAutostart
 import com.flix.music.core.ui.LocalAppGraph
 import com.flix.music.core.ui.window.LocalWindowFrame
 import com.flix.music.core.ui.window.WindowFrame
@@ -24,10 +28,14 @@ import org.jetbrains.compose.resources.painterResource
 import java.awt.Dimension
 
 /** Opens Flix's window and warms NewPipe up, so the first song does not pay for YouTube's player script. */
-fun main() = application {
+fun main(args: Array<String>) = application {
     val graph = remember { AppGraph() }
     remember { graph.applicationScope.launch(Dispatchers.IO) { graph.newPipeSetup.warmUp() } }
-    val windowState = rememberWindowState(size = DpSize(1280.dp, 820.dp))
+    val settings by graph.settingsRepository.settings.collectAsState(initial = null)
+    val windowState = rememberWindowState(
+        size = DpSize(1280.dp, 820.dp),
+        isMinimized = WindowsAutostart.MINIMIZED_ARGUMENT in args,
+    )
     val closeApp = {
         graph.close()
         exitApplication()
@@ -47,11 +55,17 @@ fun main() = application {
             window.roundCornersOnWindows11()
         }
         CompositionLocalProvider(LocalAppGraph provides graph, LocalWindowFrame provides frame) {
-            FlixTheme(themeMode = ThemeMode.Dark) {
+            FlixTheme(themeMode = settings?.theme?.toThemeMode() ?: ThemeMode.System) {
                 WindowSurface { FlixDesktopApp() }
             }
         }
     }
+}
+
+private fun AppTheme.toThemeMode(): ThemeMode = when (this) {
+    AppTheme.System -> ThemeMode.System
+    AppTheme.Light -> ThemeMode.Light
+    AppTheme.Dark -> ThemeMode.Dark
 }
 
 private const val MIN_WIDTH = 960

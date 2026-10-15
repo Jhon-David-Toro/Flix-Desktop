@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -44,15 +45,18 @@ import com.flix.music.core.ui.window.WindowDragArea
 import com.flix.music.feature.player.PlayerBar
 import com.flix.music.feature.player.PlayerBarActions
 import com.flix.music.feature.search.SearchScreen
+import com.flix.music.feature.settings.SettingsScreen
 import com.flix.music.resources.Res
 import com.flix.music.resources.ic_home
 import com.flix.music.resources.ic_home_filled
 import com.flix.music.resources.ic_library_music
 import com.flix.music.resources.ic_library_music_filled
 import com.flix.music.resources.ic_search
+import com.flix.music.resources.ic_settings
 import com.flix.music.resources.tab_home
 import com.flix.music.resources.tab_library
 import com.flix.music.resources.tab_search
+import com.flix.music.resources.tab_settings
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
@@ -63,6 +67,7 @@ enum class Section(val label: StringResource, val icon: DrawableResource, val se
     Home(Res.string.tab_home, Res.drawable.ic_home, Res.drawable.ic_home_filled),
     Search(Res.string.tab_search, Res.drawable.ic_search, Res.drawable.ic_search),
     Library(Res.string.tab_library, Res.drawable.ic_library_music, Res.drawable.ic_library_music_filled),
+    Settings(Res.string.tab_settings, Res.drawable.ic_settings, Res.drawable.ic_settings),
 }
 
 /**
@@ -125,6 +130,7 @@ fun FlixDesktopApp() {
                     ) {
                         when (section) {
                             Section.Search -> SearchScreen(onGenreClick = {}, modifier = Modifier.fillMaxSize())
+                            Section.Settings -> SettingsScreen(modifier = Modifier.fillMaxSize())
                             else -> Text(
                                 text = stringResource(section.label),
                                 style = FlixTheme.typography.headline,
@@ -162,9 +168,12 @@ private fun SideMenu(selected: Section, onSelect: (Section) -> Unit) {
                 .padding(start = FlixTheme.spacing.md, bottom = FlixTheme.spacing.sm),
             contentAlignment = Alignment.BottomStart,
         ) { Wordmark() }
-        Section.entries.forEach { entry ->
+        Section.entries.filter { entry -> entry != Section.Settings }.forEach { entry ->
             SideMenuItem(section = entry, isSelected = entry == selected, onClick = { onSelect(entry) })
         }
+        Spacer(Modifier.weight(1f))
+        SideMenuItem(section = Section.Settings, isSelected = selected == Section.Settings, onClick = { onSelect(Section.Settings) })
+        Spacer(Modifier.height(FlixTheme.spacing.md))
     }
 }
 

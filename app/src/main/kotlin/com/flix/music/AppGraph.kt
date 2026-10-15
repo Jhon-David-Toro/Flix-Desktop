@@ -9,16 +9,22 @@ import com.flix.music.core.data.repository.MusicRepository
 import com.flix.music.core.data.repository.MusicRepositoryImpl
 import com.flix.music.core.data.repository.RecentSearchesRepository
 import com.flix.music.core.data.repository.RecentSearchesRepositoryImpl
+import com.flix.music.core.data.repository.SettingsRepository
+import com.flix.music.core.data.repository.SettingsRepositoryImpl
 import com.flix.music.core.data.youtube.NewPipeSetup
 import com.flix.music.core.data.youtube.YouTubeMusicClient
+import com.flix.music.core.player.DesktopAutoplay
 import com.flix.music.core.player.DesktopPlayerController
 import com.flix.music.core.player.mpv.MpvEngine
 import com.flix.music.core.player.stream.AudioServer
 import com.flix.music.core.player.stream.NewPipeStreamResolver
+import com.flix.music.core.system.WindowsAutostart
 import com.flix.music.feature.search.SearchViewModel
+import com.flix.music.feature.settings.SettingsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import java.io.File
@@ -64,10 +70,26 @@ class AppGraph(val dataDirectory: File = defaultDataDirectory()) {
 
     val recentSearchesRepository: RecentSearchesRepository = RecentSearchesRepositoryImpl(preferences, json)
 
+    val settingsRepository: SettingsRepository = SettingsRepositoryImpl(preferences)
+
+    private val autostart = WindowsAutostart()
+
+    private val autoplay = DesktopAutoplay(
+        player = player,
+        musicRepository = musicRepository,
+        autoplayEnabled = settingsRepository.settings.map { settings -> settings.autoplay },
+        scope = applicationScope,
+    )
+
+    init {
+        autoplay.start()
+    }
+
     /** Builds the screen ViewModels, as Hilt does on the phone; [savedStateHandle] carries navigation arguments. */
     @Suppress("UNCHECKED_CAST", "UNUSED_PARAMETER")
     fun <Model : ViewModel> viewModel(type: KClass<Model>, savedStateHandle: SavedStateHandle): Model = when (type) {
         SearchViewModel::class -> SearchViewModel(musicRepository, recentSearchesRepository, player)
+        SettingsViewModel::class -> SettingsViewModel(settingsRepository, autostart, VERSION)
         else -> error("No ViewModel factory for ${type.simpleName}")
     } as Model
 
@@ -76,18 +98,20 @@ class AppGraph(val dataDirectory: File = defaultDataDirectory()) {
         audioServer.stop()
     }
 
-    private companion object {
-        const val CONNECT_TIMEOUT_SECONDS = 10L
-        const val READ_TIMEOUT_SECONDS = 30L
+    companion object {
+        /** Keep in step with `packageVersion` in app/build.gradle.kts. */
+        const val VERSION = "1.0.0"
+        private const val CONNECT_TIMEOUT_SECONDS = 10L
+        private const val READ_TIMEOUT_SECONDS = 30L
 
-        fun defaultDataDirectory(): File {
+        private fun defaultDataDirectory(): File {
             val appData = System.getenv("APPDATA")
             val directory = if (appData != null) File(appData, "Flix") else File(System.getProperty("user.home"), ".flix")
             return directory.apply { mkdirs() }
         }
 
         /** Packaged next to the app; in development, Gradle points here at `app/resources/windows`. */
-        fun libmpvFile(): File {
+        private fun libmpvFile(): File {
             val resources = System.getProperty("compose.application.resources.dir")
             return if (resources != null) File(resources, "libmpv-2.dll") else File("resources/windows/libmpv-2.dll")
         }

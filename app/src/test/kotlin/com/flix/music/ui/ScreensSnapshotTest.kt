@@ -8,9 +8,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.flix.music.core.designsystem.component.NowPlayingMarker
 import com.flix.music.core.designsystem.theme.FlixTheme
+import com.flix.music.core.designsystem.theme.ThemeMode
 import com.flix.music.core.model.AlbumRef
+import com.flix.music.core.model.AppTheme
 import com.flix.music.core.model.ArtistRef
 import com.flix.music.core.model.Track
+import com.flix.music.core.model.UserSettings
 import com.flix.music.core.player.PlaybackSource
 import com.flix.music.core.player.PlaybackStatus
 import com.flix.music.core.player.PlayerState
@@ -21,6 +24,8 @@ import com.flix.music.feature.search.SearchActions
 import com.flix.music.feature.search.SearchContent
 import com.flix.music.feature.search.SearchFilter
 import com.flix.music.feature.search.SearchUiState
+import com.flix.music.feature.settings.SettingsActions
+import com.flix.music.feature.settings.SettingsContent
 import org.junit.Test
 import kotlin.time.Duration.Companion.seconds
 
@@ -74,6 +79,23 @@ class ScreensSnapshotTest {
                 recentSearches = listOf("fade to black", "bad bunny"),
                 actions = SearchActions(),
             )
+        }
+    }
+
+    @Test
+    fun `ajustes en oscuro y en claro`() {
+        listOf(ThemeMode.Dark to "settings-dark", ThemeMode.Light to "settings-light").forEach { (mode, name) ->
+            snapshot(name, height = 700, themeMode = mode) {
+                Box(Modifier.fillMaxSize().background(FlixTheme.colors.background)) {
+                    SettingsContent(
+                        settings = UserSettings(theme = AppTheme.System, autoplay = true),
+                        startsWithWindows = true,
+                        canStartWithWindows = true,
+                        version = "1.0.0",
+                        actions = SettingsActions(),
+                    )
+                }
+            }
         }
     }
 }

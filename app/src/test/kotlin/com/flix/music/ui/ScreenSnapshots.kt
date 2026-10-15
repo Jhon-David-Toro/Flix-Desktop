@@ -12,9 +12,15 @@ import java.io.File
  * Renders screens to PNG under `build/snapshots` without opening a window, to review
  * the desktop layout. Fonts load asynchronously, so a few frames are drawn first.
  */
-internal fun snapshot(name: String, width: Int = 1280, height: Int = 820, content: @Composable () -> Unit) {
+internal fun snapshot(
+    name: String,
+    width: Int = 1280,
+    height: Int = 820,
+    themeMode: ThemeMode = ThemeMode.Dark,
+    content: @Composable () -> Unit,
+) {
     val scene = ImageComposeScene(width, height, Density(1f)) {
-        FlixTheme(themeMode = ThemeMode.Dark) { content() }
+        FlixTheme(themeMode = themeMode) { content() }
     }
     repeat(SETTLE_FRAMES) { frame -> scene.render(frame * FRAME_NANOS) }
     Thread.sleep(FONT_LOAD_MILLIS)

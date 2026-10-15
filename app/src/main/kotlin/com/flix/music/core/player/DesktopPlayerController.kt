@@ -139,6 +139,8 @@ class DesktopPlayerController(
         startCurrent(from = position)
     }
 
+    fun queuedTrackIds(): Set<String> = queue.trackIds
+
     fun setVolume(percent: Int) = engine.setVolume(percent)
 
     fun release() = engine.close()

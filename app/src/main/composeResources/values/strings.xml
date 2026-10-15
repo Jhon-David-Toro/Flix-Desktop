@@ -358,4 +358,10 @@
     <string name="onboarding_collections_body">Guarda favoritos, crea playlists y sigue a tus artistas. Todo se queda en tu teléfono.</string>
     <string name="onboarding_player_title">Un reproductor que se aparta</string>
     <string name="onboarding_player_body">El mini player te acompaña mientras navegas. Desliza hacia arriba para abrirlo y ver la cola.</string>
+    <!-- Solo en escritorio -->
+    <string name="settings_desktop">Escritorio</string>
+    <string name="settings_start_with_windows">Iniciar Flix con Windows</string>
+    <string name="settings_start_with_windows_body">Se abre minimizado al encender el equipo</string>
+    <string name="settings_start_with_windows_unavailable">Disponible en la versión instalada</string>
+    <string name="tab_settings">Ajustes</string>
 </resources>

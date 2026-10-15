@@ -32,6 +32,8 @@ class PlayQueue(private val random: Random = Random.Default) {
 
     operator fun get(index: Int): Track = entries[index].track
 
+    val trackIds: Set<String> get() = entries.mapTo(HashSet()) { entry -> entry.track.id }
+
     /** What plays after the current song, in order (repeat is not unrolled). */
     val upNext: List<QueueItem>
         get() = entries.indices.drop(currentIndex + 1).map { index -> QueueItem(index, entries[index].track) }
