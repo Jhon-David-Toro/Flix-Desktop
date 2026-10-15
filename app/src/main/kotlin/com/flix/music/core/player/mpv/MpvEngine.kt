@@ -1,5 +1,8 @@
 package com.flix.music.core.player.mpv
 
+import com.flix.music.core.common.Log
+import com.flix.music.core.player.AudioEngine
+import com.flix.music.core.player.AudioSignal
 import com.flix.music.core.player.mpv.Libmpv.Companion.END_FILE_REASON_EOF
 import com.flix.music.core.player.mpv.Libmpv.Companion.END_FILE_REASON_ERROR
 import com.flix.music.core.player.mpv.Libmpv.Companion.EVENT_END_FILE
@@ -14,38 +17,12 @@ import com.sun.jna.Pointer
 import java.io.File
 import java.util.Locale
 
-/** What mpv reports while it plays, delivered on mpv's own event thread. */
-sealed interface MpvSignal {
-    /** A new file started opening. */
-    data object Loading : MpvSignal
-
-    /** The file opened; [MpvSignal.Duration] and positions follow. */
-    data object Loaded : MpvSignal
-
-    /** Playback (re)started after loading or seeking. */
-    data object Restarted : MpvSignal
-
-    data class Position(val seconds: Double) : MpvSignal
-
-    data class Duration(val seconds: Double) : MpvSignal
-
-    data class Paused(val paused: Boolean) : MpvSignal
-
-    /** Waiting for the network mid-song. */
-    data class Buffering(val buffering: Boolean) : MpvSignal
-
-    /** The song played to its end. */
-    data object Finished : MpvSignal
-
-    data class Failed(val message: String) : MpvSignal
-}
-
 /**
  * One libmpv instance set up for music: no video, no yt-dlp, the whole song kept in
  * memory once loaded (so seeking back is instant), and named "Flix" in the Windows
  * volume mixer. Commands can be called from any thread; [onSignal] runs on mpv's.
  */
-class MpvEngine(libraryFile: File, private val onSignal: (MpvSignal) -> Unit) : AutoCloseable {
+class MpvEngine(libraryFile: File, private val onSignal: (AudioSignal) -> Unit) : AudioEngine {
 
     private val mpv = Libmpv.load(libraryFile)
     private val handle: Pointer = requireNotNull(mpv.mpv_create()) { "libmpv could not create a player" }
@@ -60,22 +37,20 @@ class MpvEngine(libraryFile: File, private val onSignal: (MpvSignal) -> Unit) : 
         Thread(::pumpEvents, "flix-mpv-events").apply { isDaemon = true }.start()
     }
 
-    /** Replaces whatever plays with [url], from [startSeconds], paused or not. */
-    fun load(url: String, startSeconds: Double = 0.0, paused: Boolean = false) {
+    override fun load(url: String, startSeconds: Double, paused: Boolean) {
         val options = "start=${format(startSeconds)},pause=${if (paused) "yes" else "no"}"
         command("loadfile", url, "replace", "-1", options)
     }
 
-    fun setPaused(paused: Boolean) {
+    override fun setPaused(paused: Boolean) {
         mpv.mpv_set_property_string(handle, "pause", if (paused) "yes" else "no")
     }
 
-    fun seek(seconds: Double) = command("seek", format(seconds), "absolute+exact")
+    override fun seek(seconds: Double) = command("seek", format(seconds), "absolute+exact")
 
-    fun stop() = command("stop")
+    override fun stop() = command("stop")
 
-    /** 0–100. */
-    fun setVolume(percent: Int) {
+    override fun setVolume(percent: Int) {
         mpv.mpv_set_property_string(handle, "volume", percent.coerceIn(0, MAX_VOLUME).toString())
     }
 
@@ -86,7 +61,7 @@ class MpvEngine(libraryFile: File, private val onSignal: (MpvSignal) -> Unit) : 
 
     private fun command(vararg args: String) {
         val result = mpv.mpv_command(handle, arrayOf(*args, null))
-        if (result < 0) onSignal(MpvSignal.Failed("${args.first()}: ${mpv.mpv_error_string(result)}"))
+        if (result < 0) Log.w(TAG, "${args.first()} failed: ${mpv.mpv_error_string(result)}")
     }
 
     private fun pumpEvents() {
@@ -94,9 +69,9 @@ class MpvEngine(libraryFile: File, private val onSignal: (MpvSignal) -> Unit) : 
             val event = MpvEvent(mpv.mpv_wait_event(handle, WAIT_FOREVER))
             when (event.event_id) {
                 EVENT_SHUTDOWN -> return
-                EVENT_START_FILE -> onSignal(MpvSignal.Loading)
-                EVENT_FILE_LOADED -> onSignal(MpvSignal.Loaded)
-                EVENT_PLAYBACK_RESTART -> onSignal(MpvSignal.Restarted)
+                EVENT_START_FILE -> onSignal(AudioSignal.Loading)
+                EVENT_FILE_LOADED -> onSignal(AudioSignal.Loaded)
+                EVENT_PLAYBACK_RESTART -> onSignal(AudioSignal.Restarted)
                 EVENT_END_FILE -> event.data?.let(::MpvEventEndFile)?.let(::onEndFile)
                 EVENT_PROPERTY_CHANGE -> event.data?.let(::MpvEventProperty)?.let(::onProperty)
             }
@@ -105,24 +80,25 @@ class MpvEngine(libraryFile: File, private val onSignal: (MpvSignal) -> Unit) : 
 
     private fun onEndFile(endFile: MpvEventEndFile) {
         when (endFile.reason) {
-            END_FILE_REASON_EOF -> onSignal(MpvSignal.Finished)
-            END_FILE_REASON_ERROR -> onSignal(MpvSignal.Failed(mpv.mpv_error_string(endFile.error)))
+            END_FILE_REASON_EOF -> onSignal(AudioSignal.Finished)
+            END_FILE_REASON_ERROR -> onSignal(AudioSignal.Failed(mpv.mpv_error_string(endFile.error)))
         }
     }
 
     private fun onProperty(property: MpvEventProperty) {
         val data = property.data ?: return
         when (property.name) {
-            "time-pos" -> onSignal(MpvSignal.Position(data.getDouble(0)))
-            "duration" -> onSignal(MpvSignal.Duration(data.getDouble(0)))
-            "pause" -> onSignal(MpvSignal.Paused(data.getInt(0) != 0))
-            "paused-for-cache" -> onSignal(MpvSignal.Buffering(data.getInt(0) != 0))
+            "time-pos" -> onSignal(AudioSignal.Position(data.getDouble(0)))
+            "duration" -> onSignal(AudioSignal.Duration(data.getDouble(0)))
+            "pause" -> onSignal(AudioSignal.Paused(data.getInt(0) != 0))
+            "paused-for-cache" -> onSignal(AudioSignal.Buffering(data.getInt(0) != 0))
         }
     }
 
     private fun format(seconds: Double): String = String.format(Locale.ROOT, "%.3f", seconds)
 
     private companion object {
+        const val TAG = "MpvEngine"
         const val WAIT_FOREVER = -1.0
         const val MAX_VOLUME = 100
         val OPTIONS = listOf(

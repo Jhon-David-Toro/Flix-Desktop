@@ -1,8 +1,8 @@
 package com.flix.music.core.player.stream
 
 import com.flix.music.core.data.youtube.NewPipeSetup
+import com.flix.music.core.player.AudioSignal
 import com.flix.music.core.player.mpv.MpvEngine
-import com.flix.music.core.player.mpv.MpvSignal
 import okhttp3.OkHttpClient
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
@@ -30,10 +30,10 @@ class AudioServerLiveTest {
         val started = System.nanoTime()
         val engine = MpvEngine(library) { signal ->
             when (signal) {
-                is MpvSignal.Position -> position = signal.seconds
-                is MpvSignal.Duration -> duration = signal.seconds
-                MpvSignal.Restarted -> restarted.countDown()
-                is MpvSignal.Failed -> println("fallo: ${signal.message}")
+                is AudioSignal.Position -> position = signal.seconds
+                is AudioSignal.Duration -> duration = signal.seconds
+                AudioSignal.Restarted -> restarted.countDown()
+                is AudioSignal.Failed -> println("fallo: ${signal.message}")
                 else -> Unit
             }
         }
