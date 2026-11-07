@@ -11,6 +11,9 @@ import com.flix.music.core.model.ArtistRef
  */
 interface DetailNavigator {
 
+    /** Opens the full player (the "Seguir escuchando" card). */
+    fun openPlayer()
+
     fun openSong(trackId: String)
 
     fun openArtist(artist: ArtistRef)
@@ -22,6 +25,7 @@ interface DetailNavigator {
 /** Defaults to doing nothing so previews and tests need no NavHost. */
 val LocalDetailNavigator = staticCompositionLocalOf<DetailNavigator> {
     object : DetailNavigator {
+        override fun openPlayer() = Unit
         override fun openSong(trackId: String) = Unit
         override fun openArtist(artist: ArtistRef) = Unit
         override fun openAlbum(album: AlbumRef, artist: ArtistRef?) = Unit

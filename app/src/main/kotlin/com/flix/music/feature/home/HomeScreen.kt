@@ -113,6 +113,7 @@ data class HomeActions(
     val onOpenPlaylist: (Long) -> Unit = {},
     val onOpenArtist: (ArtistRef) -> Unit = {},
     val onResume: () -> Unit = {},
+    val onOpenResume: () -> Unit = {},
     val onRecentClick: (Track) -> Unit = {},
     val onMoreFromArtistClick: (Track) -> Unit = {},
     val onTrackMore: (Track) -> Unit = {},
@@ -146,6 +147,10 @@ fun HomeScreen(
             onOpenPlaylist = onOpenPlaylist,
             onOpenArtist = detailNavigator::openArtist,
             onResume = viewModel::onResume,
+            onOpenResume = {
+                viewModel.onOpenResume()
+                detailNavigator.openPlayer()
+            },
             onRecentClick = viewModel::onRecentClick,
             onMoreFromArtistClick = viewModel::onMoreFromArtistClick,
             onTrackMore = { track -> trackMenu.open(track) },
@@ -191,6 +196,7 @@ fun HomeContent(
                     resume = resume,
                     isPlaying = resume.isInPlayer && isPlaying,
                     onResume = actions.onResume,
+                    onOpen = actions.onOpenResume,
                     modifier = Modifier
                         .padding(horizontal = FlixTheme.spacing.gutter)
                         .padding(top = FlixTheme.spacing.xs),
@@ -281,12 +287,18 @@ private fun HomeTopBar(
  * 4:16", a small play button and the progress beam when the song is in the player.
  */
 @Composable
-private fun ResumeCard(resume: ResumeItem, isPlaying: Boolean, onResume: () -> Unit, modifier: Modifier = Modifier) {
+private fun ResumeCard(
+    resume: ResumeItem,
+    isPlaying: Boolean,
+    onResume: () -> Unit,
+    onOpen: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val subtitle = listOfNotNull(
         resume.track.artistNames,
         resume.remaining?.let { remaining -> stringResource(Res.string.home_time_left, remaining.toClock()) },
     ).joinToString(" · ")
-    FlixCard(modifier = modifier.fillMaxWidth(), onClick = onResume) {
+    FlixCard(modifier = modifier.fillMaxWidth(), onClick = onOpen) {
         Column(Modifier.padding(FlixTheme.spacing.md)) {
             Text(
                 text = stringResource(Res.string.home_resume).uppercase(),

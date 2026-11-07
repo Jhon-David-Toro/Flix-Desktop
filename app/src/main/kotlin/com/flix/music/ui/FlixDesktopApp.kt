@@ -107,6 +107,10 @@ fun FlixDesktopApp(volume: Int, onVolumeChange: (Int) -> Unit) {
 
     val detailNavigator = remember(navController) {
         object : DetailNavigator {
+            override fun openPlayer() {
+                nowPlayingOpen = true
+            }
+
             override fun openSong(trackId: String) {
                 nowPlayingOpen = false
                 navController.navigateToSong(trackId)

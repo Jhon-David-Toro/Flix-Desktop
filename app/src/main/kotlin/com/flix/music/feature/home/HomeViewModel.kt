@@ -117,7 +117,13 @@ class HomeViewModel(
         local.copy(topArtist = artist, moreFromArtist = more)
     }.stateIn(viewModelScope, WhileUiSubscribed, HomeUiState())
 
-    /** Resumes the player, or plays the last song again when the player is empty. */
+    /** The card itself: makes sure the song is loaded (the last one plays again if the player is empty); the screen then opens the full player. */
+    fun onOpenResume() {
+        val resume = uiState.value.resume ?: return
+        if (!resume.isInPlayer) playerController.play(listOf(resume.track), 0, PlaybackSource.History)
+    }
+
+    /** The card's play button: pauses or resumes, or plays the last song again when the player is empty. */
     fun onResume() {
         val resume = uiState.value.resume ?: return
         if (resume.isInPlayer) {
