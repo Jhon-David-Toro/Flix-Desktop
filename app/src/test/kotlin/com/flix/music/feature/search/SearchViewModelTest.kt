@@ -170,7 +170,7 @@ class SearchViewModelTest {
     }
 
     @Test
-    fun `tocar una canción reproduce desde ella hasta el final de los resultados`() = runTest {
+    fun `tocar una canción reproduce solo esa y deja que la reproducción automática siga`() = runTest {
         val killshot = Track("2", "Killshot", listOf(ArtistRef(null, "Eminem")), null, null, null)
         val lately = Track("3", "Lately", listOf(ArtistRef(null, "Luar La L")), null, null, null)
         repository.tracks = listOf(fadeToBlack, killshot, lately)
@@ -181,7 +181,7 @@ class SearchViewModelTest {
 
         assertEquals(
             FakePlayerController.PlayRequest(
-                tracks = listOf(killshot, lately),
+                tracks = listOf(killshot),
                 startIndex = 0,
                 source = PlaybackSource.Search("fade"),
                 shuffle = false,

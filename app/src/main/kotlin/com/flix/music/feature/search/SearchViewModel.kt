@@ -98,13 +98,14 @@ class SearchViewModel(
         viewModelScope.launch { recentSearchesRepository.clear() }
     }
 
-    /** Plays [track] followed by the rest of the results (design: queue from search results). */
+    /**
+     * Plays only [track]: the results are usually versions of the same song, so queueing
+     * them repeats it; the music goes on with its radio (autoplay) instead.
+     */
     fun onTrackClick(track: Track) {
-        val tracks = currentResults()?.tracks ?: return
-        val startIndex = tracks.indexOfFirst { it.id == track.id }
-        if (startIndex < 0) return
+        if (currentResults()?.tracks?.any { it.id == track.id } != true) return
         playerController.play(
-            tracks = tracks.drop(startIndex),
+            tracks = listOf(track),
             startIndex = 0,
             source = PlaybackSource.Search(query.trim()),
         )

@@ -40,7 +40,7 @@ class DesktopAutoplay(
                 seedId = null
                 return@launch
             }
-            player.appendToQueue(autoplayAdditions(radio, player.queuedTrackIds()))
+            player.appendToQueue(autoplayAdditions(radio, player.queuedTracks()))
         }
     }
 }

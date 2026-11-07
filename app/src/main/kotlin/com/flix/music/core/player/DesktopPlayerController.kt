@@ -147,7 +147,7 @@ class DesktopPlayerController(
         startCurrent(from = position)
     }
 
-    fun queuedTrackIds(): Set<String> = queue.trackIds
+    fun queuedTracks(): List<Track> = queue.tracks
 
     /** Where the music is now, to pick it up after Flix restarts; null with an empty queue. */
     fun session(): PlayerSession? = queue.snapshot()?.let { snapshot -> PlayerSession.of(snapshot, position, source) }
