@@ -275,6 +275,10 @@
     <string name="download_remove">Quitar descarga</string>
     <string name="download_started">Descargando. La tendrás en Perfil → Descargas.</string>
     <string name="download_playlist_started">Descargando la playlist. La tendrás en Perfil → Descargas.</string>
+    <string name="download_favorites_started">Descargando tus favoritos. Los tendrás en Perfil → Descargas.</string>
+    <string name="download_favorites">Descargar favoritos</string>
+    <string name="download_all_done">Todo descargado</string>
+    <string name="download_all_in_progress">Descargando…</string>
     <string name="download_removed">Descarga quitada</string>
     <string name="downloads_state_downloaded">Disponible sin conexión</string>
     <string name="downloads_state_downloading">Descargando · %1$d%%</string>

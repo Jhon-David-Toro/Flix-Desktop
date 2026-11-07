@@ -6,15 +6,17 @@ import androidx.lifecycle.viewModelScope
 import com.flix.music.core.data.repository.DownloadsRepository
 import com.flix.music.core.data.repository.PlaylistsRepository
 import com.flix.music.core.designsystem.component.NowPlayingMarker
+import com.flix.music.core.model.DownloadAllState
 import com.flix.music.core.model.Playlist
 import com.flix.music.core.model.Track
+import com.flix.music.core.model.downloadAllState
 import com.flix.music.core.model.totalDuration
 import com.flix.music.core.player.PlaybackSource
 import com.flix.music.core.player.PlayerController
 import com.flix.music.core.ui.WhileUiSubscribed
 import com.flix.music.core.ui.nowPlaying
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlin.time.Duration
@@ -23,7 +25,11 @@ sealed interface PlaylistUiState {
 
     data object Loading : PlaylistUiState
 
-    data class Content(val playlist: Playlist, val totalDuration: Duration) : PlaylistUiState
+    data class Content(
+        val playlist: Playlist,
+        val totalDuration: Duration,
+        val downloadState: DownloadAllState = DownloadAllState.None,
+    ) : PlaylistUiState
 
     /** The playlist was deleted (from this screen or elsewhere); the screen closes. */
     data object Missing : PlaylistUiState
@@ -42,15 +48,16 @@ class PlaylistViewModel(
 
     val nowPlaying: StateFlow<NowPlayingMarker> = playerController.nowPlaying(viewModelScope)
 
-    val uiState: StateFlow<PlaylistUiState> = playlistsRepository.playlist(playlistId)
-        .map { playlist ->
-            if (playlist == null) {
-                PlaylistUiState.Missing
-            } else {
-                PlaylistUiState.Content(playlist, playlist.tracks.totalDuration())
-            }
+    val uiState: StateFlow<PlaylistUiState> = combine(
+        playlistsRepository.playlist(playlistId),
+        downloadsRepository.downloads,
+    ) { playlist, downloads ->
+        if (playlist == null) {
+            PlaylistUiState.Missing
+        } else {
+            PlaylistUiState.Content(playlist, playlist.tracks.totalDuration(), playlist.tracks.downloadAllState(downloads))
         }
-        .stateIn(viewModelScope, WhileUiSubscribed, PlaylistUiState.Loading)
+    }.stateIn(viewModelScope, WhileUiSubscribed, PlaylistUiState.Loading)
 
     fun onPlay() = playFrom(startIndex = 0, shuffle = false)
 

@@ -166,7 +166,7 @@ class AppGraph(val dataDirectory: File = defaultDataDirectory()) {
             favoritesRepository, historyRepository, playlistsRepository, savedAlbumsRepository,
             followedArtistsRepository, libraryLayoutRepository, player, clock,
         )
-        FavoritesViewModel::class -> FavoritesViewModel(favoritesRepository, player)
+        FavoritesViewModel::class -> FavoritesViewModel(favoritesRepository, player, downloadsRepository)
         HistoryViewModel::class -> HistoryViewModel(historyRepository, player, clock)
         PlaylistViewModel::class -> PlaylistViewModel(savedStateHandle, playlistsRepository, player, downloadsRepository)
         PlaylistEditViewModel::class -> PlaylistEditViewModel(savedStateHandle, playlistsRepository)

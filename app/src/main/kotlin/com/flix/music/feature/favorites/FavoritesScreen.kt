@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.flix.music.core.designsystem.component.DownloadAllButton
 import com.flix.music.core.designsystem.component.FavoriteButton
 import com.flix.music.core.designsystem.component.FavoritesArtwork
 import com.flix.music.core.designsystem.component.FilledTonalIconButton
@@ -57,6 +58,8 @@ import com.flix.music.resources.favorites_title
 import com.flix.music.resources.ic_favorite
 import com.flix.music.resources.ic_play_arrow_filled
 import com.flix.music.resources.ic_search_off
+import com.flix.music.resources.download_favorites
+import com.flix.music.resources.download_favorites_started
 import com.flix.music.resources.ic_shuffle
 import com.flix.music.resources.player_shuffle
 import com.flix.music.resources.search_clear
@@ -75,6 +78,7 @@ data class FavoritesActions(
     val onSortOrderChange: (SortOrder) -> Unit = {},
     val onPlayAll: () -> Unit = {},
     val onShuffle: () -> Unit = {},
+    val onDownloadAll: () -> Unit = {},
     val onTrackClick: (Track) -> Unit = {},
     val onRemove: (FavoriteTrack) -> Unit = {},
     val onUndoRemove: (FavoriteTrack) -> Unit = {},
@@ -90,7 +94,10 @@ fun FavoritesScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val sortOrder by viewModel.currentSortOrder.collectAsStateWithLifecycle()
     val nowPlaying by viewModel.nowPlaying.collectAsStateWithLifecycle()
-    val actions = remember(viewModel, onBack, onBrowseMusic) {
+    val snackbarHostState = LocalSnackbarHostState.current
+    val coroutineScope = rememberCoroutineScope()
+    val downloadStartedMessage = stringResource(Res.string.download_favorites_started)
+    val actions = remember(viewModel, onBack, onBrowseMusic, snackbarHostState) {
         FavoritesActions(
             onBack = onBack,
             onBrowseMusic = onBrowseMusic,
@@ -98,6 +105,10 @@ fun FavoritesScreen(
             onSortOrderChange = viewModel::onSortOrderChange,
             onPlayAll = viewModel::onPlayAll,
             onShuffle = viewModel::onShuffle,
+            onDownloadAll = {
+                viewModel.onDownloadAll()
+                coroutineScope.launch { snackbarHostState.showSnackbar(downloadStartedMessage) }
+            },
             onTrackClick = viewModel::onTrackClick,
             onRemove = viewModel::onRemove,
             onUndoRemove = viewModel::onUndoRemove,
@@ -247,6 +258,11 @@ private fun FavoritesHeader(content: FavoritesUiState.Content, actions: Favorite
                         contentDescription = stringResource(Res.string.player_shuffle),
                     )
                 }
+                DownloadAllButton(
+                    state = content.downloadState,
+                    label = stringResource(Res.string.download_favorites),
+                    onClick = actions.onDownloadAll,
+                )
                 PlayPauseButton(
                     icon = Res.drawable.ic_play_arrow_filled,
                     contentDescription = stringResource(Res.string.favorites_play_all),

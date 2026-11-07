@@ -31,6 +31,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.flix.music.core.designsystem.component.ConfirmDialog
+import com.flix.music.core.designsystem.component.DownloadAllButton
 import com.flix.music.core.designsystem.component.FlixBottomSheet
 import com.flix.music.core.designsystem.component.FlixTopAppBar
 import com.flix.music.core.designsystem.component.IconButton
@@ -47,6 +48,7 @@ import com.flix.music.core.designsystem.component.TrackRow
 import com.flix.music.core.designsystem.component.util.toReadableLength
 import com.flix.music.core.designsystem.theme.FlixTheme
 import com.flix.music.core.model.ArtistRef
+import com.flix.music.core.model.DownloadAllState
 import com.flix.music.core.model.Playlist
 import com.flix.music.core.model.Track
 import com.flix.music.core.model.totalDuration
@@ -277,7 +279,7 @@ private fun PlaylistHeader(content: PlaylistUiState.Content, actions: PlaylistAc
                 modifier = Modifier.padding(top = 6.dp),
             )
             if (playlist.tracks.isNotEmpty()) {
-                PlaylistActionsRow(actions)
+                PlaylistActionsRow(actions, content.downloadState)
             }
         }
     }
@@ -292,7 +294,7 @@ private fun playlistSummary(trackCount: Int, length: String): String =
     }
 
 @Composable
-private fun PlaylistActionsRow(actions: PlaylistActions) {
+private fun PlaylistActionsRow(actions: PlaylistActions, downloadState: DownloadAllState) {
     Row(
         modifier = Modifier.padding(top = 10.dp, bottom = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -312,6 +314,11 @@ private fun PlaylistActionsRow(actions: PlaylistActions) {
                 tint = FlixTheme.colors.textPrimary,
             )
         }
+        DownloadAllButton(
+            state = downloadState,
+            label = stringResource(Res.string.playlist_download),
+            onClick = actions.onDownload,
+        )
         Spacer(Modifier.weight(1f))
         IconButton(onClick = actions.onShuffle) {
             Icon(

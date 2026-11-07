@@ -5,6 +5,7 @@ import com.flix.music.core.model.FavoriteTrack
 import com.flix.music.core.model.SortOrder
 import com.flix.music.core.model.Track
 import com.flix.music.core.player.PlaybackSource
+import com.flix.music.testing.FakeDownloadsRepository
 import com.flix.music.testing.FakeFavoritesRepository
 import com.flix.music.testing.FakePlayerController
 import com.flix.music.testing.MainDispatcherRule
@@ -35,7 +36,8 @@ class FavoritesViewModelTest {
 
     private val repository = FakeFavoritesRepository(listOf(killshot, fadeToBlack))
     private val playerController = FakePlayerController()
-    private val viewModel by lazy { FavoritesViewModel(repository, playerController) }
+    private val downloadsRepository = FakeDownloadsRepository()
+    private val viewModel by lazy { FavoritesViewModel(repository, playerController, downloadsRepository) }
 
     private fun kotlinx.coroutines.test.TestScope.collectUiState() {
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect {} }
@@ -93,5 +95,16 @@ class FavoritesViewModelTest {
         viewModel.onUndoRemove(killshot)
         advanceUntilIdle()
         assertEquals(listOf("1", "2"), visibleIds())
+    }
+
+    @Test
+    fun `descargar todo baja todos los favoritos, aunque la búsqueda filtre`() = runTest {
+        collectUiState()
+        viewModel.onQueryChange("fade")
+        advanceUntilIdle()
+
+        viewModel.onDownloadAll()
+
+        assertEquals(setOf(killshot.track, fadeToBlack.track), downloadsRepository.current.map { it.track }.toSet())
     }
 }

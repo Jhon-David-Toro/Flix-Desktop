@@ -5,11 +5,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.flix.music.core.data.repository.DownloadsRepository
 import com.flix.music.core.data.repository.FavoritesRepository
 import com.flix.music.core.designsystem.component.NowPlayingMarker
+import com.flix.music.core.model.DownloadAllState
 import com.flix.music.core.model.FavoriteTrack
 import com.flix.music.core.model.SortOrder
 import com.flix.music.core.model.Track
+import com.flix.music.core.model.downloadAllState
 import com.flix.music.core.model.matching
 import com.flix.music.core.model.sortedFor
 import com.flix.music.core.model.totalDuration
@@ -33,6 +36,7 @@ sealed interface FavoritesUiState {
         val all: List<FavoriteTrack>,
         val visible: List<FavoriteTrack>,
         val totalDuration: Duration,
+        val downloadState: DownloadAllState = DownloadAllState.None,
     ) : FavoritesUiState
 }
 
@@ -40,6 +44,7 @@ sealed interface FavoritesUiState {
 class FavoritesViewModel(
     private val favoritesRepository: FavoritesRepository,
     private val playerController: PlayerController,
+    private val downloadsRepository: DownloadsRepository,
 ) : ViewModel() {
 
     /** Field text as snapshot state (no lag while typing); [searchText] drives the filtering. */
@@ -56,11 +61,14 @@ class FavoritesViewModel(
         favoritesRepository.favorites,
         searchText,
         sortOrder,
-    ) { favorites, text, order ->
+        downloadsRepository.downloads,
+    ) { favorites, text, order, downloads ->
+        val tracks = favorites.map { it.track }
         FavoritesUiState.Content(
             all = favorites,
             visible = favorites.sortedFor(order).matching(text),
-            totalDuration = favorites.map { it.track }.totalDuration(),
+            totalDuration = tracks.totalDuration(),
+            downloadState = tracks.downloadAllState(downloads),
         )
     }.stateIn(viewModelScope, WhileUiSubscribed, FavoritesUiState.Loading)
 
@@ -74,6 +82,9 @@ class FavoritesViewModel(
     fun onSortOrderChange(order: SortOrder) {
         sortOrder.value = order
     }
+
+    /** Downloads every favorite (not only what the search shows); songs already saved are skipped. */
+    fun onDownloadAll() = downloadsRepository.download((uiState.value as? FavoritesUiState.Content)?.all?.map { it.track }.orEmpty())
 
     fun onPlayAll() = playVisible(startIndex = 0, shuffle = false)
 
