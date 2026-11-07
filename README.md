@@ -51,9 +51,23 @@ powershell -File scripts/fetch-libmpv.ps1
 
 # 3. Tests
 ./gradlew.bat :app:test
+```
 
-# 4. Generar el instalador MSI
-./gradlew.bat :app:packageMsi
+### Generar el instalador (MSI)
+
+1. Descarga libmpv (paso 1 de arriba) si aún no lo hiciste; el instalador lo incluye.
+2. Genera el MSI:
+
+   ```powershell
+   ./gradlew.bat :app:packageMsi
+   ```
+
+3. El instalador queda en `app/build/compose/binaries/main/msi/Flix-1.0.0.msi`. Tarda unos minutos y pesa ~130 MB porque incluye el runtime de Java.
+
+Para cambiar la versión edita `packageVersion` en `app/build.gradle.kts`. Para publicarlo en GitHub:
+
+```powershell
+gh release create v1.0.0 app/build/compose/binaries/main/msi/Flix-1.0.0.msi --title "Flix Desktop 1.0.0"
 ```
 
 ## Tecnologías
