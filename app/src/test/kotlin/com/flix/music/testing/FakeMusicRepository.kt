@@ -30,6 +30,14 @@ class FakeMusicRepository : MusicRepository {
         return tracks
     }
 
+    var videos: List<Track> = emptyList()
+
+    override suspend fun searchVideos(query: String): List<Track> {
+        delay(responseDelayMillis)
+        error?.let { throw FlixException(it) }
+        return videos
+    }
+
     var songDetails: SongDetails? = null
 
     override fun cachedTrack(trackId: String): Track? = tracks.firstOrNull { it.id == trackId }

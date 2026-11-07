@@ -3,7 +3,6 @@ package com.flix.music.core.data.repository
 import com.flix.music.core.data.network.catalogCall
 import com.flix.music.core.data.youtube.NewPipeSetup
 import com.flix.music.core.data.youtube.YouTubeMusicClient
-import com.flix.music.core.data.youtube.rankedSearchResults
 import com.flix.music.core.data.youtube.upscaledThumbnail
 import com.flix.music.core.model.ArtistRef
 import com.flix.music.core.model.SongDetails
@@ -25,7 +24,13 @@ class MusicRepositoryImpl(
     private val seenTracks = ConcurrentHashMap<String, Track>()
 
     override suspend fun search(query: String): List<Track> = catalogCall {
-        rankedSearchResults(youTubeMusicClient.searchSongs(query), runCatching { youTubeMusicClient.searchVideos(query) }.getOrDefault(emptyList()))
+        youTubeMusicClient.searchSongs(query)
+            .distinctBy { it.id }
+            .onEach { track -> seenTracks[track.id] = track }
+    }
+
+    override suspend fun searchVideos(query: String): List<Track> = catalogCall {
+        youTubeMusicClient.searchVideos(query)
             .distinctBy { it.id }
             .onEach { track -> seenTracks[track.id] = track }
     }

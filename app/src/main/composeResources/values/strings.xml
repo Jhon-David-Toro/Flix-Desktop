@@ -21,6 +21,7 @@
     <string name="search_empty_body">Revisa la ortografía o prueba solo con el nombre del artista o del álbum.</string>
     <string name="search_filter_all">Todo</string>
     <string name="search_section_songs">Canciones</string>
+    <string name="search_section_videos">Videos</string>
     <string name="search_section_artists">Artistas</string>
     <string name="search_section_albums">Álbumes</string>
     <string name="search_best_result">Mejor resultado</string>

@@ -16,6 +16,8 @@ import com.flix.music.core.player.PlaybackSource
 import com.flix.music.core.player.PlayerController
 import com.flix.music.core.ui.nowPlaying
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -103,7 +105,8 @@ class SearchViewModel(
      * them repeats it; the music goes on with its radio (autoplay) instead.
      */
     fun onTrackClick(track: Track) {
-        if (currentResults()?.tracks?.any { it.id == track.id } != true) return
+        val results = currentResults() ?: return
+        if ((results.tracks + results.videos).none { it.id == track.id }) return
         playerController.play(
             tracks = listOf(track),
             startIndex = 0,
@@ -122,7 +125,13 @@ class SearchViewModel(
     private suspend fun search(searchQuery: String) {
         _uiState.value = SearchUiState.Loading(previous = currentResults())
         _uiState.value = try {
-            val tracks = repository.search(searchQuery)
+            val (songs, allVideos) = coroutineScope {
+                val videosRequest = async { try { repository.searchVideos(searchQuery) } catch (exception: FlixException) { emptyList() } }
+                repository.search(searchQuery) to videosRequest.await()
+            }
+            val videos = allVideos.filterNot { video -> songs.any { song -> song.id == video.id } }
+            // Without songs, the videos take their place so the results always lead with something.
+            val tracks = songs.ifEmpty { videos }
             if (tracks.isEmpty()) {
                 SearchUiState.Empty(
                     query = searchQuery,
@@ -134,6 +143,7 @@ class SearchViewModel(
                     tracks = tracks,
                     artists = tracks.distinctArtists(),
                     albums = tracks.distinctAlbums(),
+                    videos = if (songs.isEmpty()) emptyList() else videos,
                 )
             }
         } catch (exception: FlixException) {

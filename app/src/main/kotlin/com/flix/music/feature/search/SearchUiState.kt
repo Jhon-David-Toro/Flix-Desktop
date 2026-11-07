@@ -22,6 +22,7 @@ sealed interface SearchUiState {
         val tracks: List<Track>,
         val artists: List<Artist>,
         val albums: List<Album>,
+        val videos: List<Track> = emptyList(),
     ) : SearchUiState
 
     /** No results for [query]; [suggestions] are similarly spelled recent searches. */

@@ -5,12 +5,14 @@ import com.flix.music.resources.search_filter_all
 import com.flix.music.resources.search_section_albums
 import com.flix.music.resources.search_section_artists
 import com.flix.music.resources.search_section_songs
+import com.flix.music.resources.search_section_videos
 import org.jetbrains.compose.resources.StringResource
 
 
 enum class SearchFilter(val label: StringResource) {
     All(Res.string.search_filter_all),
     Songs(Res.string.search_section_songs),
+    Videos(Res.string.search_section_videos),
     Artists(Res.string.search_section_artists),
     Albums(Res.string.search_section_albums),
 }

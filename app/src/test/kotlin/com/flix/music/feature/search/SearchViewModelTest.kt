@@ -191,6 +191,22 @@ class SearchViewModelTest {
     }
 
     @Test
+    fun `los videos salen aparte, después de las canciones, y no repiten canciones`() = runTest {
+        val live = Track("v1", "Fade To Black (Live)", listOf(ArtistRef(null, "Metallica")), null, null, null)
+        repository.tracks = listOf(fadeToBlack)
+        repository.videos = listOf(live, fadeToBlack)
+        viewModel.onQueryChange("fade")
+        advanceUntilIdle()
+
+        val results = viewModel.uiState.value as SearchUiState.Results
+        assertEquals(listOf(fadeToBlack), results.tracks)
+        assertEquals(listOf(live), results.videos)
+
+        viewModel.onTrackClick(live)
+        assertEquals(listOf(live), playerController.lastPlayRequest?.tracks)
+    }
+
+    @Test
     fun `borrar vuelve al reposo`() = runTest {
         repository.tracks = listOf(fadeToBlack)
         viewModel.onQueryChange("fade")

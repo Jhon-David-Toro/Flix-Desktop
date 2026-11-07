@@ -11,6 +11,9 @@ interface MusicRepository {
 
     suspend fun search(query: String): List<Track>
 
+    /** Videos for [query] (live versions, remixes, covers, fan uploads); shown below the songs. */
+    suspend fun searchVideos(query: String): List<Track> = emptyList()
+
     /** A song already seen in a search this session, so its detail can open instantly. */
     fun cachedTrack(trackId: String): Track?
 

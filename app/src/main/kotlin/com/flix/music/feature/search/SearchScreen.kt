@@ -92,6 +92,7 @@ import com.flix.music.resources.search_remove_recent
 import com.flix.music.resources.search_section_albums
 import com.flix.music.resources.search_section_artists
 import com.flix.music.resources.search_section_songs
+import com.flix.music.resources.search_section_videos
 import com.flix.music.resources.search_use_suggestion
 import com.flix.music.resources.see_all
 import com.flix.music.resources.tab_search
@@ -371,6 +372,7 @@ private fun SearchError(error: FlixError, recentSearches: List<String>, actions:
 private fun FilterChipsRow(
     selected: SearchFilter,
     onFilterChange: (SearchFilter) -> Unit,
+    hasVideos: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -380,7 +382,7 @@ private fun FilterChipsRow(
             .padding(top = FlixTheme.spacing.lg),
         horizontalArrangement = Arrangement.spacedBy(FlixTheme.spacing.sm),
     ) {
-        SearchFilter.entries.forEach { searchFilter ->
+        SearchFilter.entries.filter { searchFilter -> searchFilter != SearchFilter.Videos || hasVideos }.forEach { searchFilter ->
             FlixFilterChip(
                 label = stringResource(searchFilter.label),
                 selected = searchFilter == selected,
@@ -432,13 +434,14 @@ private fun SearchResults(
     actions: SearchActions,
 ) {
     Column {
-        FilterChipsRow(selected = filter, onFilterChange = actions.onFilterChange)
+        FilterChipsRow(selected = filter, onFilterChange = actions.onFilterChange, hasVideos = results.videos.isNotEmpty())
         LazyColumn(
             contentPadding = PaddingValues(top = FlixTheme.spacing.lg, bottom = FlixTheme.spacing.xxl),
         ) {
             when (filter) {
                 SearchFilter.All -> allResults(results, nowPlaying, actions)
                 SearchFilter.Songs -> trackItems(results.tracks, nowPlaying, actions.onTrackClick)
+                SearchFilter.Videos -> trackItems(results.videos, nowPlaying, actions.onTrackClick)
                 SearchFilter.Artists -> cardGrid(results.artists, key = { it.id }) { artist, cardModifier ->
                     MediaCard(
                         title = artist.name,
@@ -492,6 +495,18 @@ private fun LazyListScope.allResults(
             )
         }
         trackItems(moreSongs, nowPlaying, actions.onTrackClick)
+    }
+
+    if (results.videos.isNotEmpty()) {
+        item(key = "videos-header") {
+            SectionHeader(
+                title = stringResource(Res.string.search_section_videos),
+                actionLabel = stringResource(Res.string.see_all),
+                onAction = { actions.onFilterChange(SearchFilter.Videos) },
+                modifier = Modifier.padding(top = FlixTheme.spacing.sectionGap),
+            )
+        }
+        trackItems(results.videos.take(VIDEOS_PREVIEW_COUNT), nowPlaying, actions.onTrackClick)
     }
 
     if (results.artists.isNotEmpty()) {
@@ -561,6 +576,7 @@ private fun <Item> LazyListScope.cardGrid(
 }
 
 private const val SONGS_PREVIEW_COUNT = 3
+private const val VIDEOS_PREVIEW_COUNT = 5
 private const val DIMMED_ALPHA = 0.5f
 private const val SECTION_TITLE_SKELETON_WIDTH = 0.35f
 private val SKELETON_ROW_WIDTHS = listOf(0.7f to 0.45f, 0.6f to 0.4f, 0.75f to 0.35f)
