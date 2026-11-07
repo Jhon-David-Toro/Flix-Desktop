@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
@@ -305,7 +306,8 @@ private fun QueueRow(
             .fillMaxWidth()
             .height(COMPACT_ROW_HEIGHT)
             .then(if (isDragged) Modifier.shadow(6.dp, FlixTheme.shapes.md) else Modifier)
-            .background(if (isDragged) FlixTheme.colors.surfaceElevated else FlixTheme.colors.background)
+            .clip(FlixTheme.shapes.md)
+            .background(if (isDragged) FlixTheme.colors.surfaceElevated else Color.Transparent)
             .handCursor().clickable(onClick = onClick)
             .semantics { customActions = accessibilityActions }
             .padding(start = FlixTheme.spacing.gutter, end = FlixTheme.spacing.xs),
