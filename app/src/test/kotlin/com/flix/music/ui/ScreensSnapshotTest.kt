@@ -39,12 +39,28 @@ import kotlin.time.Duration.Companion.seconds
 /** Snapshots of the desktop screens with sample data, written to `build/snapshots`. */
 class ScreensSnapshotTest {
 
+    /** Sample covers drawn here, so the screenshots show artwork without the network. */
+    private fun cover(index: Int): String {
+        val hues = floatArrayOf(0.62f, 0.02f, 0.08f, 0.45f)
+        val file = java.io.File("build/snapshots/covers/cover-$index.png").apply { parentFile.mkdirs() }
+        val image = java.awt.image.BufferedImage(600, 600, java.awt.image.BufferedImage.TYPE_INT_RGB)
+        val g = image.createGraphics()
+        g.paint = java.awt.GradientPaint(0f, 0f, java.awt.Color.getHSBColor(hues[index], 0.8f, 0.9f), 600f, 600f, java.awt.Color.getHSBColor(hues[index] + 0.1f, 0.9f, 0.25f))
+        g.fillRect(0, 0, 600, 600)
+        g.paint = java.awt.Color(255, 255, 255, 60)
+        g.fillOval(150, 150, 300, 300)
+        g.fillOval(250, 250, 100, 100)
+        g.dispose()
+        javax.imageio.ImageIO.write(image, "png", file)
+        return file.toURI().toString().replaceFirst("file:/", "file:///")
+    }
+
     private val metallica = ArtistRef("UC1", "Metallica")
     private val tracks = listOf(
-        Track("1", "Fade To Black", listOf(metallica), AlbumRef("a1", "Ride The Lightning"), 417.seconds, null),
-        Track("2", "Master of Puppets", listOf(metallica), AlbumRef("a2", "Master of Puppets"), 516.seconds, null),
-        Track("3", "One", listOf(metallica), AlbumRef("a3", "...And Justice for All"), 446.seconds, null),
-        Track("4", "Nothing Else Matters", listOf(metallica), AlbumRef("a4", "Metallica"), 388.seconds, null),
+        Track("1", "Fade To Black", listOf(metallica), AlbumRef("a1", "Ride The Lightning"), 417.seconds, cover(0)),
+        Track("2", "Master of Puppets", listOf(metallica), AlbumRef("a2", "Master of Puppets"), 516.seconds, cover(1)),
+        Track("3", "One", listOf(metallica), AlbumRef("a3", "...And Justice for All"), 446.seconds, cover(2)),
+        Track("4", "Nothing Else Matters", listOf(metallica), AlbumRef("a4", "Metallica"), 388.seconds, cover(3)),
     )
     private val playerState = PlayerState(
         status = PlaybackStatus.Playing,
