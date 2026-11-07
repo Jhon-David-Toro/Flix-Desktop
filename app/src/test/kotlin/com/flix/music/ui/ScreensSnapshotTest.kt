@@ -26,6 +26,9 @@ import com.flix.music.feature.player.LyricsUiState
 import com.flix.music.feature.player.NowPlayingContent
 import com.flix.music.feature.player.PlayerBar
 import com.flix.music.feature.player.PlayerBarActions
+import com.flix.music.feature.player.QueueActions
+import com.flix.music.feature.player.QueuePanel
+import com.flix.music.core.player.QueueItem
 import com.flix.music.feature.player.VolumeBar
 import com.flix.music.feature.search.SearchActions
 import com.flix.music.feature.search.SearchContent
@@ -162,6 +165,20 @@ class ScreensSnapshotTest {
         Column(Modifier.fillMaxSize().background(FlixTheme.colors.surfaceElevated)) {
             listOf(0, 50, 100).forEach { level ->
                 VolumeBar(volume = level, onVolumeChange = {}, contentDescription = "Volumen", modifier = Modifier.width(160.dp))
+            }
+        }
+    }
+
+    @Test
+    fun `cola sin cuadrado negro ni rojo en reposo`() = snapshot("queue", height = 700) {
+        Box(Modifier.fillMaxSize().background(FlixTheme.colors.background)) {
+            androidx.compose.runtime.CompositionLocalProvider(
+                com.flix.music.core.designsystem.component.LocalSnackbarHostState provides androidx.compose.material3.SnackbarHostState(),
+            ) {
+            QueuePanel(
+                state = playerState.copy(upNext = tracks.drop(1).mapIndexed { index, track -> QueueItem(index + 1, track) }),
+                actions = QueueActions(),
+            )
             }
         }
     }

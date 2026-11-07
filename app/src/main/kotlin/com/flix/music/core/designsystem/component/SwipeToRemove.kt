@@ -36,6 +36,8 @@ fun SwipeToRemove(
             if (dismissValue == SwipeToDismissBoxValue.EndToStart) onRemove()
         },
         backgroundContent = {
+            // Only while swiping: rows may be transparent, and the red must not show through at rest.
+            if (dismissState.dismissDirection == SwipeToDismissBoxValue.Settled) return@SwipeToDismissBox
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -51,6 +53,9 @@ fun SwipeToRemove(
             }
         },
     ) {
-        content()
+        // Opaque only while swiping, so the red layer behind it never shows through the row.
+        Box(Modifier.background(if (dismissState.dismissDirection == SwipeToDismissBoxValue.Settled) Color.Transparent else FlixTheme.colors.background)) {
+            content()
+        }
     }
 }
