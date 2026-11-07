@@ -39,6 +39,15 @@ class YouTubeMusicClient(
             },
         )
 
+    /** Videos for [query] (live versions, remixes, covers, fan uploads), best match first (about 20). */
+    fun searchVideos(query: String): List<Track> =
+        parseSongSearch(
+            post(SEARCH_URL) {
+                put("query", query)
+                put("params", VIDEOS_FILTER)
+            },
+        )
+
     /** The song's radio: similar songs to keep playing after it (about 50, the song itself first). */
     fun radio(trackId: String): List<Track> =
         parseRadio(
@@ -85,6 +94,7 @@ class YouTubeMusicClient(
         const val CLIENT_NAME = "WEB_REMIX"
         const val LANGUAGE = "en"
         const val SONGS_FILTER = "EgWKAQIIAWoMEA4QChADEAQQCRAF"
+        const val VIDEOS_FILTER = "EgWKAQIQAWoMEA4QChADEAQQCRAF"
         const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0"
         val JSON_MEDIA_TYPE = "application/json".toMediaType()
         val CLIENT_DATE: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
