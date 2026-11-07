@@ -27,3 +27,12 @@ data class AlbumRef(
 
 /** A song plus whether it can be played now (design: "No disponible" when playability ≠ OK). */
 data class SongDetails(val track: Track, val isPlayable: Boolean)
+
+private val ARTWORK_SIZE = Regex("=w[0-9]+-h[0-9]+")
+
+/**
+ * The cover for the big player: YouTube's image CDN serves the same picture at any size, so
+ * the 544 px list cover becomes 1200 px (sharp on high-density screens). Other hosts, such
+ * as video thumbnails, have no size in their address and stay as they are.
+ */
+val Track.largeArtworkUrl: String? get() = artworkUrl?.replaceFirst(ARTWORK_SIZE, "=w1200-h1200")

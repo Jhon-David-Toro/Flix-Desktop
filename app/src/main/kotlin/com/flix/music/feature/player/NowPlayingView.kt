@@ -46,6 +46,7 @@ import com.flix.music.core.designsystem.component.IconButton
 import com.flix.music.core.designsystem.component.Segment
 import com.flix.music.core.designsystem.component.util.rememberArtworkTint
 import com.flix.music.core.designsystem.theme.FlixTheme
+import com.flix.music.core.model.largeArtworkUrl
 import com.flix.music.core.player.PlayerState
 import com.flix.music.core.ui.flixViewModel
 import com.flix.music.resources.Res
@@ -139,7 +140,7 @@ fun NowPlayingContent(
                 val artworkSize = minOf(maxWidth, maxHeight - SONG_INFO_HEIGHT).coerceIn(MIN_ARTWORK, MAX_ARTWORK)
                 Column(Modifier.widthIn(max = artworkSize)) {
                     AsyncImage(
-                        model = track.artworkUrl,
+                        model = track.largeArtworkUrl,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
