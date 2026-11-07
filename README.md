@@ -36,7 +36,7 @@
 
 ## Instalación
 
-Descarga el instalador `Flix-1.1.0.msi` desde la sección de [Releases](../../releases) y ejecútalo. Incluye todo lo necesario (también el runtime de Java).
+Descarga el instalador `Flix-1.1.1.msi` desde la sección de [Releases](../../releases) y ejecútalo. Incluye todo lo necesario (también el runtime de Java).
 
 ## Compilar desde el código
 
@@ -62,12 +62,12 @@ powershell -File scripts/fetch-libmpv.ps1
    ./gradlew.bat :app:packageMsi
    ```
 
-3. El instalador queda en `app/build/compose/binaries/main/msi/Flix-1.1.0.msi`. Tarda unos minutos y pesa ~130 MB porque incluye el runtime de Java.
+3. El instalador queda en `app/build/compose/binaries/main/msi/Flix-1.1.1.msi`. Tarda unos minutos y pesa ~130 MB porque incluye el runtime de Java.
 
 Para cambiar la versión edita `packageVersion` en `app/build.gradle.kts`. Para publicarlo en GitHub:
 
 ```powershell
-gh release create v1.1.0 app/build/compose/binaries/main/msi/Flix-1.1.0.msi --title "Flix Desktop 1.1.0"
+gh release create v1.1.1 app/build/compose/binaries/main/msi/Flix-1.1.1.msi --title "Flix Desktop 1.1.1"
 ```
 
 ## Tecnologías
