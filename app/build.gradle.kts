@@ -60,7 +60,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Msi, TargetFormat.Exe)
             packageName = "Flix"
-            packageVersion = "1.1.2"
+            packageVersion = "1.1.3"
             description = "Flix Music para escritorio"
             vendor = "Jhon David Toro"
             copyright = "© 2026 Jhon David Toro. GPL-3.0."
